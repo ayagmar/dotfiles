@@ -1,0 +1,289 @@
+#!/usr/bin/env node
+
+const fs = require("fs");
+const crypto = require("crypto");
+const { spawn, execFileSync } = require("child_process");
+
+const cmd = process.argv[2];
+const valid = new Set(["launch", "status", "toggle-record", "toggle-replay", "save-replay"]);
+const obsIcon = fs.existsSync("/usr/share/icons/hicolor/scalable/apps/com.obsproject.Studio.svg")
+  ? "/usr/share/icons/hicolor/scalable/apps/com.obsproject.Studio.svg"
+  : "com.obsproject.Studio";
+
+function usage() {
+  console.error("usage: obsctl <launch|status|toggle-record|toggle-replay|save-replay>");
+  process.exit(2);
+}
+
+if (!valid.has(cmd)) {
+  usage();
+}
+
+function obsRunning() {
+  try {
+    execFileSync("pgrep", ["-x", "obs"], { stdio: "ignore" });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function launchObs(args = []) {
+  spawn("obs", args, {
+    detached: true,
+    stdio: "ignore",
+  }).unref();
+}
+
+function notify(summary, body = "", timeout = 2500) {
+  try {
+    execFileSync(
+      "gdbus",
+      [
+        "call",
+        "--session",
+        "--dest",
+        "org.freedesktop.Notifications",
+        "--object-path",
+        "/org/freedesktop/Notifications",
+        "--method",
+        "org.freedesktop.Notifications.Notify",
+        "OBS",
+        "0",
+        obsIcon,
+        summary,
+        body,
+        "[]",
+        "{}",
+        String(timeout),
+      ],
+      { stdio: "ignore" },
+    );
+  } catch {}
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function waitForFile(path, timeoutMs = 15000) {
+  const start = Date.now();
+  while (Date.now() - start < timeoutMs) {
+    try {
+      const stat = fs.statSync(path);
+      if (stat.isFile() && stat.size > 0) return true;
+    } catch {}
+    await sleep(250);
+  }
+  return false;
+}
+
+async function cleanupRemuxedSource(recordingPath) {
+  if (!recordingPath || !recordingPath.endsWith(".mkv")) return false;
+
+  const mp4Path = recordingPath.slice(0, -4) + ".mp4";
+  const remuxed = await waitForFile(mp4Path, 20000);
+  if (!remuxed) return false;
+
+  try {
+    fs.unlinkSync(recordingPath);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function sha256b64(input) {
+  return crypto.createHash("sha256").update(input).digest("base64");
+}
+
+function readWsConfig() {
+  const path = "/home/ayagmar/.config/obs-studio/plugin_config/obs-websocket/config.json";
+  return JSON.parse(fs.readFileSync(path, "utf8"));
+}
+
+async function connectWs(config) {
+  return new Promise((resolve, reject) => {
+    const ws = new WebSocket(`ws://127.0.0.1:${config.server_port || 4455}`);
+    const pending = new Map();
+    let nextId = 1;
+    let settled = false;
+
+    function finish(err) {
+      if (!settled) {
+        settled = true;
+        if (err) reject(err);
+        else resolve({
+          request(type, requestData = {}) {
+            return new Promise((res, rej) => {
+              const requestId = String(nextId++);
+              pending.set(requestId, { res, rej });
+              ws.send(
+                JSON.stringify({
+                  op: 6,
+                  d: {
+                    requestType: type,
+                    requestId,
+                    requestData,
+                  },
+                }),
+              );
+            });
+          },
+          close() {
+            ws.close();
+          },
+        });
+      }
+    }
+
+    const timeout = setTimeout(() => {
+      try {
+        ws.close();
+      } catch {}
+      finish(new Error("timeout"));
+    }, 1500);
+
+    ws.addEventListener("message", (event) => {
+      const msg = JSON.parse(event.data);
+
+      if (msg.op === 0) {
+        const identify = { rpcVersion: 1, eventSubscriptions: 0 };
+        const auth = msg.d.authentication;
+        if (auth) {
+          const secret = sha256b64((config.server_password || "") + auth.salt);
+          identify.authentication = sha256b64(secret + auth.challenge);
+        }
+        ws.send(JSON.stringify({ op: 1, d: identify }));
+        return;
+      }
+
+      if (msg.op === 2) {
+        clearTimeout(timeout);
+        finish();
+        return;
+      }
+
+      if (msg.op === 7) {
+        const entry = pending.get(msg.d.requestId);
+        if (!entry) return;
+        pending.delete(msg.d.requestId);
+        if (msg.d.requestStatus?.result) entry.res(msg.d.responseData || {});
+        else entry.rej(new Error(msg.d.requestStatus?.comment || "request failed"));
+      }
+    });
+
+    ws.addEventListener("error", () => {
+      clearTimeout(timeout);
+      finish(new Error("connect failed"));
+    });
+
+    ws.addEventListener("close", () => {
+      clearTimeout(timeout);
+      if (!settled) finish(new Error("closed"));
+    });
+  });
+}
+
+async function run() {
+  if (cmd === "launch") {
+    if (!obsRunning()) launchObs();
+    return;
+  }
+
+  const running = obsRunning();
+
+  let config;
+  try {
+    config = readWsConfig();
+  } catch {
+    if (cmd === "status") {
+      console.log(JSON.stringify({
+        obsRunning: running,
+        websocket: false,
+        recording: false,
+        replayBuffer: false,
+      }));
+      return;
+    }
+
+    console.error("OBS websocket config not found.");
+    process.exit(1);
+  }
+
+  let ws;
+  try {
+    ws = await connectWs(config);
+  } catch {
+    if (cmd === "status") {
+      console.log(JSON.stringify({
+        obsRunning: running,
+        websocket: false,
+        recording: false,
+        replayBuffer: false,
+      }));
+      return;
+    }
+
+    if (!obsRunning()) {
+      if (cmd === "toggle-record") {
+        launchObs(["--startrecording", "--minimize-to-tray"]);
+        notify("OBS recording started", "OBS launched in the tray.", 2200);
+      } else if (cmd === "toggle-replay") {
+        launchObs(["--startreplaybuffer", "--minimize-to-tray"]);
+        notify("OBS replay buffer started", "OBS launched in the tray.", 2200);
+      }
+      return;
+    }
+
+    notify("OBS control unavailable", "Restart OBS once to re-enable hotkeys.", 3500);
+    console.error("OBS is running but websocket control is unavailable. Restart OBS once.");
+    process.exit(1);
+  }
+
+  try {
+    if (cmd === "status") {
+      const recordStatus = await ws.request("GetRecordStatus");
+      const replayStatus = await ws.request("GetReplayBufferStatus");
+      console.log(JSON.stringify({
+        obsRunning: running,
+        websocket: true,
+        recording: Boolean(recordStatus.outputActive),
+        replayBuffer: Boolean(replayStatus.outputActive),
+      }));
+    } else if (cmd === "toggle-record") {
+      const status = await ws.request("GetRecordStatus");
+      const stopping = status.outputActive;
+      const recordingPath = status.outputPath || "";
+      await ws.request(stopping ? "StopRecord" : "StartRecord");
+      let cleanedUp = false;
+      if (stopping) cleanedUp = await cleanupRemuxedSource(recordingPath);
+      notify(
+        stopping ? "OBS recording stopped" : "OBS recording started",
+        stopping
+          ? cleanedUp
+            ? "MP4 saved to Videos. Source MKV removed."
+            : "Recording saved to Videos."
+          : "Local recording is running.",
+      );
+    } else if (cmd === "toggle-replay") {
+      const status = await ws.request("GetReplayBufferStatus");
+      const stopping = status.outputActive;
+      await ws.request(stopping ? "StopReplayBuffer" : "StartReplayBuffer");
+      notify(
+        stopping ? "OBS replay buffer stopped" : "OBS replay buffer started",
+        stopping ? "Instant replay is off." : "Replay buffer is active.",
+      );
+    } else if (cmd === "save-replay") {
+      await ws.request("SaveReplayBuffer");
+      notify("OBS replay saved", "Saved the last replay buffer to Videos.", 2800);
+    }
+  } finally {
+    ws.close();
+  }
+}
+
+run().catch((err) => {
+  console.error(err.message || String(err));
+  process.exit(1);
+});

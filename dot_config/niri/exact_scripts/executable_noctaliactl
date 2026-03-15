@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+LOG_FILE="/tmp/noctalia-shell.log"
+NOCTALIA_CONFIG_PATH="/etc/xdg/quickshell/noctalia-shell/shell.qml"
+
+shell_running() {
+  qs list --all 2>/dev/null | grep -Fq "Config path: $NOCTALIA_CONFIG_PATH"
+}
+
+wait_for_shell() {
+  local attempts="${1:-40}"
+  local delay="${2:-0.1}"
+  local i
+
+  for ((i = 0; i < attempts; i++)); do
+    if shell_running; then
+      return 0
+    fi
+    sleep "$delay"
+  done
+
+  return 1
+}
+
+start_shell() {
+  if shell_running; then
+    return 0
+  fi
+
+  qs -d -c noctalia-shell --no-duplicate >"$LOG_FILE" 2>&1 || true
+  wait_for_shell
+}
+
+restart_shell() {
+  qs kill -c noctalia-shell --any-display --newest >/dev/null 2>&1 || true
+  sleep 0.2
+  start_shell
+}
+
+ipc_call() {
+  if [[ $# -lt 2 ]]; then
+    echo "usage: noctaliactl ipc <service> <action> [args...]" >&2
+    exit 2
+  fi
+
+  start_shell
+  qs ipc -c noctalia-shell --any-display call "$@"
+}
+
+case "${1:-}" in
+  start-shell)
+    start_shell
+    ;;
+  restart-shell)
+    restart_shell
+    ;;
+  ipc)
+    shift
+    ipc_call "$@"
+    ;;
+  *)
+    echo "usage: noctaliactl <start-shell|restart-shell|ipc ...>" >&2
+    exit 2
+    ;;
+esac

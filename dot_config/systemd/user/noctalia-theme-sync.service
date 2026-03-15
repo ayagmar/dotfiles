@@ -1,0 +1,6 @@
+[Unit]
+Description=Run Noctalia theme sync after theme color changes
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/bash -lc 'bash "$HOME/.config/noctalia/scripts/theme-sync.sh" --source color-watcher'

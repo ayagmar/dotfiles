@@ -1,0 +1,16 @@
+{
+    "id": "obs-status",
+    "name": "OBS Control",
+    "version": "0.1.0",
+    "author": "Codex",
+    "description": "OBS recording and replay status widget for Noctalia.",
+    "entryPoints": {
+        "main": "Main.qml",
+        "panel": "Panel.qml",
+        "barWidget": "BarWidget.qml",
+        "controlCenterWidget": "ControlCenterWidget.qml"
+    },
+    "metadata": {
+        "cpuIntensive": false
+    }
+}

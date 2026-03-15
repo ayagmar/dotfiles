@@ -1,0 +1,10 @@
+[user]
+	name = Abdeslam Yassine Agmar
+	email = abdeslamgmar@gmail.com
+	signingkey = 146F5C7179A49F57
+[init]
+	defaultBranch = master
+[commit]
+	gpgsign = true
+[tag]
+	gpgSign = true
