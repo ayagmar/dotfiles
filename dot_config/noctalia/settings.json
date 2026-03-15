@@ -14,7 +14,7 @@
         "enableWindowsSearch": true,
         "iconMode": "tabler",
         "ignoreMouseInput": false,
-        "overviewLayer": false,
+        "overviewLayer": true,
         "pinnedApps": [
         ],
         "position": "center",
@@ -415,9 +415,9 @@
         "performanceModeDisabled": "",
         "performanceModeEnabled": "",
         "screenLock": "",
-        "screenUnlock": "",
+        "screenUnlock": "systemctl --user start openrgb-apply.service >/dev/null 2>&1 || true",
         "session": "",
-        "startup": "",
+        "startup": "bash ~/.config/noctalia/scripts/apply-niri-theme.sh >/dev/null 2>&1 && niri msg action load-config-file >/dev/null 2>&1 || true",
         "wallpaperChange": "bash ~/.config/noctalia/scripts/theme-sync.sh --source wallpaper-change"
     },
     "idle": {
