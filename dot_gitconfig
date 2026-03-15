@@ -1,10 +1,20 @@
 [user]
-	name = Abdeslam Yassine Agmar
-	email = abdeslamgmar@gmail.com
-	signingkey = 146F5C7179A49F57
+	name = ayagmar
+	email = 62888618+ayagmar@users.noreply.github.com
+	signingkey = /home/ayagmar/.ssh/id_github_ayagmar.pub
 [init]
 	defaultBranch = master
 [commit]
 	gpgsign = true
 [tag]
 	gpgSign = true
+[gpg]
+	format = ssh
+[gpg "ssh"]
+	allowedSignersFile = /home/ayagmar/.ssh/allowed_signers
+[credential "https://github.com"]
+	helper = 
+	helper = !/usr/bin/gh auth git-credential
+[credential "https://gist.github.com"]
+	helper = 
+	helper = !/usr/bin/gh auth git-credential
