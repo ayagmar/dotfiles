@@ -1,0 +1,6 @@
+helium-browser-bin
+noctalia-shell
+openrgb-git
+vesktop
+yay
+yay-debug

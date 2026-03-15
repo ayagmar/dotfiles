@@ -8,6 +8,12 @@ Personal Arch Linux dotfiles for `niri`, Noctalia, Kitty, zsh, and desktop autom
 - `dot_zprofile`
 - `dot_gitconfig`
 - `dot_config/starship.toml`
+- `dot_local/bin`
+  - `dotfiles-bootstrap`
+  - `dotfiles-refresh-state`
+- `dot_local/share/dotfiles`
+  - exported pacman and AUR package manifests
+  - exported enabled user-unit manifest
 - `dot_config/kitty`
   - Kitty config and theme base
 - `dot_config/niri`
@@ -31,6 +37,7 @@ Personal Arch Linux dotfiles for `niri`, Noctalia, Kitty, zsh, and desktop autom
 - local scripts
 - local Noctalia plugin files
 - user systemd units
+- package manifests
 - small dependency manifests needed by local integrations
 
 ## What is intentionally not tracked
@@ -50,6 +57,8 @@ Personal Arch Linux dotfiles for `niri`, Noctalia, Kitty, zsh, and desktop autom
 - `dot_config/niri/exact_scripts/executable_obsctl`
 - `dot_config/noctalia/exact_scripts/executable_theme-sync.sh`
 - `dot_config/noctalia/exact_scripts/executable_apply-openrgb-theme.sh`
+- `dot_local/bin/executable_dotfiles-bootstrap`
+- `dot_local/bin/executable_dotfiles-refresh-state`
 
 ## Workflow
 
@@ -67,8 +76,15 @@ Review and push:
 git -C ~/.local/share/chezmoi status
 git -C ~/.local/share/chezmoi diff
 git -C ~/.local/share/chezmoi add .
-git -C ~/.local/share/chezmoi -c commit.gpgsign=false commit -m "Update dotfiles"
+git -C ~/.local/share/chezmoi commit -m "Update dotfiles"
 git -C ~/.local/share/chezmoi push
+```
+
+If you changed installed packages or enabled user services, refresh the exported manifests too:
+
+```bash
+~/.local/bin/dotfiles-refresh-state
+git -C ~/.local/share/chezmoi status
 ```
 
 Bootstrap on another machine:
@@ -76,4 +92,10 @@ Bootstrap on another machine:
 ```bash
 sudo pacman -S chezmoi git
 chezmoi init --apply ayagmar/dotfiles
+~/.local/bin/dotfiles-bootstrap
 ```
+
+Notes:
+
+- `dotfiles-bootstrap` installs the tracked native packages, installs `yay` if needed, installs tracked AUR packages, and re-enables tracked user services.
+- The package manifests are an exact export of this machine right now. Trim them later if you want a more hardware-agnostic setup.

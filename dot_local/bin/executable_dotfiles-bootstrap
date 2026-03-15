@@ -1,0 +1,121 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+data_dir="${XDG_DATA_HOME:-$HOME/.local/share}/dotfiles"
+pacman_list="$data_dir/packages/pacman.txt"
+aur_list="$data_dir/packages/aur.txt"
+user_units_list="$data_dir/systemd/user-enabled.txt"
+
+usage() {
+    cat <<'EOF'
+Usage: dotfiles-bootstrap [all|packages|services]
+
+  all       Install packages and enable tracked user services
+  packages  Install tracked pacman and AUR packages
+  services  Enable and start tracked user services
+EOF
+}
+
+require_cmd() {
+    if ! command -v "$1" >/dev/null 2>&1; then
+        printf 'Missing required command: %s\n' "$1" >&2
+        exit 1
+    fi
+}
+
+read_list() {
+    local file="$1"
+    [[ -f "$file" ]] || return 0
+    grep -Ev '^[[:space:]]*($|#)' "$file" || true
+}
+
+install_pacman_packages() {
+    require_cmd pacman
+
+    mapfile -t packages < <(read_list "$pacman_list")
+    if ((${#packages[@]} == 0)); then
+        printf 'No pacman packages listed in %s\n' "$pacman_list"
+        return
+    fi
+
+    printf 'Installing %d pacman packages...\n' "${#packages[@]}"
+    sudo pacman -S --needed "${packages[@]}"
+}
+
+install_yay() {
+    if command -v yay >/dev/null 2>&1; then
+        return
+    fi
+
+    require_cmd git
+    require_cmd makepkg
+
+    local tmpdir
+    tmpdir="$(mktemp -d)"
+    printf 'Installing yay from AUR...\n'
+    git clone https://aur.archlinux.org/yay.git "$tmpdir/yay"
+    (
+        cd "$tmpdir/yay"
+        makepkg -si --noconfirm
+    )
+    rm -rf "$tmpdir"
+}
+
+install_aur_packages() {
+    mapfile -t packages < <(read_list "$aur_list")
+    if ((${#packages[@]} == 0)); then
+        printf 'No AUR packages listed in %s\n' "$aur_list"
+        return
+    fi
+
+    install_yay
+
+    printf 'Installing %d AUR packages...\n' "${#packages[@]}"
+    yay -S --needed --noconfirm "${packages[@]}"
+}
+
+enable_user_services() {
+    require_cmd systemctl
+
+    [[ -f "$user_units_list" ]] || {
+        printf 'No user unit list found at %s\n' "$user_units_list"
+        return
+    }
+
+    printf 'Enabling tracked user services...\n'
+    systemctl --user daemon-reload
+
+    while IFS= read -r unit; do
+        [[ -n "$unit" ]] || continue
+        systemctl --user enable --now "$unit"
+    done < <(read_list "$user_units_list")
+}
+
+main() {
+    local mode="${1:-all}"
+
+    case "$mode" in
+        all)
+            install_pacman_packages
+            install_aur_packages
+            enable_user_services
+            ;;
+        packages)
+            install_pacman_packages
+            install_aur_packages
+            ;;
+        services)
+            enable_user_services
+            ;;
+        -h|--help|help)
+            usage
+            ;;
+        *)
+            usage >&2
+            exit 1
+            ;;
+    esac
+}
+
+main "$@"
