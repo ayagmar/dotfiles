@@ -12,7 +12,8 @@ Personal Arch Linux dotfiles for `niri`, Noctalia, Kitty, zsh, and desktop autom
   - `dotfiles-bootstrap`
   - `dotfiles-refresh-state`
 - `dot_local/share/dotfiles`
-  - exported pacman and AUR package manifests
+  - curated bootstrap package manifests
+  - exact package snapshot manifests
   - exported enabled user-unit manifest
 - `dot_config/kitty`
   - Kitty config and theme base
@@ -37,7 +38,7 @@ Personal Arch Linux dotfiles for `niri`, Noctalia, Kitty, zsh, and desktop autom
 - local scripts
 - local Noctalia plugin files
 - user systemd units
-- package manifests
+- package manifests and machine snapshots
 - small dependency manifests needed by local integrations
 
 ## What is intentionally not tracked
@@ -80,7 +81,7 @@ git -C ~/.local/share/chezmoi commit -m "Update dotfiles"
 git -C ~/.local/share/chezmoi push
 ```
 
-If you changed installed packages or enabled user services, refresh the exported manifests too:
+If you changed installed packages or enabled user services, refresh the exact snapshot manifests too:
 
 ```bash
 ~/.local/bin/dotfiles-refresh-state
@@ -98,4 +99,5 @@ chezmoi init --apply ayagmar/dotfiles
 Notes:
 
 - `dotfiles-bootstrap` installs the tracked native packages, installs `yay` if needed, installs tracked AUR packages, and re-enables tracked user services.
-- The package manifests are an exact export of this machine right now. Trim them later if you want a more hardware-agnostic setup.
+- `dot_local/share/dotfiles/packages/pacman.txt` and `aur.txt` are curated portable baselines.
+- `dot_local/share/dotfiles/packages/*-snapshot.txt` are exact exports from this machine for reference.

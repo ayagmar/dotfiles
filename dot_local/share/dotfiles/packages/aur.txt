@@ -1,6 +1,5 @@
-helium-browser-bin
+# Curated AUR baseline for this desktop setup.
+
+yay
 noctalia-shell
 openrgb-git
-vesktop
-yay
-yay-debug
