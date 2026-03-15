@@ -415,9 +415,9 @@
         "performanceModeDisabled": "",
         "performanceModeEnabled": "",
         "screenLock": "",
-        "screenUnlock": "systemctl --user start openrgb-apply.service >/dev/null 2>&1 || true",
+        "screenUnlock": "bash ~/.config/noctalia/scripts/apply-openrgb-theme.sh >/dev/null 2>&1 || true",
         "session": "",
-        "startup": "bash ~/.config/noctalia/scripts/apply-niri-theme.sh >/dev/null 2>&1 && niri msg action load-config-file >/dev/null 2>&1 || true",
+        "startup": "",
         "wallpaperChange": "bash ~/.config/noctalia/scripts/theme-sync.sh --source wallpaper-change"
     },
     "idle": {

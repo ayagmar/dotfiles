@@ -10,8 +10,11 @@ systemctl --user import-environment \
   XDG_SESSION_CLASS \
   NIRI_SOCKET >/dev/null 2>&1 || true
 
-systemctl --user start niri-session.target >/dev/null 2>&1 || true
-
 if ! pgrep -x polkit-kde-authentication-agent-1 >/dev/null 2>&1; then
   /usr/lib/polkit-kde-authentication-agent-1 >/dev/null 2>&1 &
 fi
+
+systemctl --user start openrgb-server.service >/dev/null 2>&1 || true
+
+"$HOME/.config/niri/scripts/noctaliactl" start-shell
+"$HOME/.config/noctalia/scripts/theme-sync.sh" --source session-start >/dev/null 2>&1 || true

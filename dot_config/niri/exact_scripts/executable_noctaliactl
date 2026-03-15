@@ -25,13 +25,18 @@ wait_for_shell() {
 }
 
 start_shell() {
-  systemctl --user start noctalia-shell.service >/dev/null 2>&1 || true
+  if shell_running; then
+    return 0
+  fi
+
+  qs -d -c noctalia-shell --no-duplicate >"$LOG_FILE" 2>&1 || true
   wait_for_shell
 }
 
 restart_shell() {
-  systemctl --user restart noctalia-shell.service >/dev/null 2>&1 || true
-  wait_for_shell
+  qs kill -c noctalia-shell --any-display --newest >/dev/null 2>&1 || true
+  sleep 0.2
+  start_shell
 }
 
 ipc_call() {

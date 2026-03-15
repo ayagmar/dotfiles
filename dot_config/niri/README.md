@@ -10,20 +10,18 @@ This directory contains the local `niri` layer for the desktop session.
 - [`../noctalia/scripts/theme-sync.sh`](/home/ayagmar/.config/noctalia/scripts/theme-sync.sh): single theme sync entrypoint
 - [`../noctalia/scripts/apply-niri-theme.sh`](/home/ayagmar/.config/noctalia/scripts/apply-niri-theme.sh): writes `niri`/Kitty theme outputs
 - [`../noctalia/scripts/apply-openrgb-theme.sh`](/home/ayagmar/.config/noctalia/scripts/apply-openrgb-theme.sh): applies RGB theme
-- [`../systemd/user/niri-session.target`](/home/ayagmar/.config/systemd/user/niri-session.target): groups services tied to the compositor session
-- [`../systemd/user/noctalia-shell.service`](/home/ayagmar/.config/systemd/user/noctalia-shell.service): keeps Noctalia shell running
-- [`../systemd/user/openrgb-apply.service`](/home/ayagmar/.config/systemd/user/openrgb-apply.service): applies RGB after the SDK server starts
 - [`../systemd/user/noctalia-theme-sync.path`](/home/ayagmar/.config/systemd/user/noctalia-theme-sync.path): watches theme color changes
-- [`../systemd/user/openrgb-server.service`](/home/ayagmar/.config/systemd/user/openrgb-server.service): keeps OpenRGB SDK server running
+- [`../systemd/user/openrgb-server.service`](/home/ayagmar/.config/systemd/user/openrgb-server.service): OpenRGB SDK server helper, started by session scripts when needed
 
 ## Startup Flow
 
 `niri` starts one bootstrap script:
 
 - import session environment into user systemd
-- start `niri-session.target`
 - start the polkit agent if missing
-- let user services own Noctalia shell and OpenRGB startup
+- start Noctalia shell from the compositor session
+- start OpenRGB server for the session
+- run one initial theme sync for `niri` + Kitty + RGB
 
 ## Theme Sync Flow
 
