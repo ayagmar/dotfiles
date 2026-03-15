@@ -1,7 +1,6 @@
 [Unit]
 Description=OpenRGB SDK Server
-After=graphical-session.target
-PartOf=graphical-session.target
+PartOf=niri-session.target
 
 [Service]
 ExecStart=/usr/bin/openrgb --server --server-host 127.0.0.1
@@ -9,4 +8,4 @@ Restart=always
 RestartSec=2
 
 [Install]
-WantedBy=default.target
+WantedBy=niri-session.target

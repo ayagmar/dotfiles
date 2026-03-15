@@ -1,0 +1,12 @@
+[Unit]
+Description=Apply Noctalia theme to OpenRGB
+After=openrgb-server.service
+Wants=openrgb-server.service
+PartOf=niri-session.target
+
+[Service]
+Type=oneshot
+ExecStart=%h/.config/noctalia/scripts/apply-openrgb-theme.sh
+
+[Install]
+WantedBy=niri-session.target
