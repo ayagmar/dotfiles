@@ -1,0 +1,4 @@
+#!/bin/sh
+
+# Detach Helium from the caller so xdg-open and terminal apps do not block on browser IO.
+exec /usr/bin/setsid -f /usr/bin/helium-browser "$@" >/dev/null 2>&1
