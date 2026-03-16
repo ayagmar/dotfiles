@@ -26,9 +26,9 @@ Personal Arch Linux dotfiles for `niri`, Noctalia, Kitty, zsh, and desktop autom
   - `settings.json`
   - local Noctalia plugin
   - theme sync scripts
-  - OpenRGB integration
+  - OpenRGB integration via local CLI helper
 - `dot_config/systemd/user`
-  - user services for OpenRGB and theme sync
+  - user services for theme sync
 
 ## What is intentionally tracked
 

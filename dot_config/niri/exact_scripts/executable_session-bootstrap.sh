@@ -3,6 +3,7 @@
 set -euo pipefail
 
 systemctl --user import-environment \
+  PATH \
   DISPLAY \
   WAYLAND_DISPLAY \
   XDG_CURRENT_DESKTOP \
@@ -13,8 +14,6 @@ systemctl --user import-environment \
 if ! pgrep -x polkit-kde-authentication-agent-1 >/dev/null 2>&1; then
   /usr/lib/polkit-kde-authentication-agent-1 >/dev/null 2>&1 &
 fi
-
-systemctl --user start openrgb-server.service >/dev/null 2>&1 || true
 
 "$HOME/.config/niri/scripts/noctaliactl" start-shell
 "$HOME/.config/noctalia/scripts/theme-sync.sh" --source session-start >/dev/null 2>&1 || true
