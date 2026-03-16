@@ -27,6 +27,8 @@ Personal Arch Linux dotfiles for `niri`, Noctalia, Kitty, zsh, and desktop autom
   - local Noctalia plugin
   - theme sync scripts
   - OpenRGB integration via local CLI helper
+- `dot_config/obs-studio/basic/profiles`
+  - tracked OBS profile config only
 - `dot_config/systemd/user`
   - user services for theme sync
 
@@ -50,6 +52,7 @@ Personal Arch Linux dotfiles for `niri`, Noctalia, Kitty, zsh, and desktop autom
 - secrets
 - SSH keys
 - enabled-unit symlinks
+- OBS scene collections with PipeWire restore tokens
 
 ## Important local entrypoints
 
@@ -101,3 +104,4 @@ Notes:
 - `dotfiles-bootstrap` installs the tracked native packages, installs `yay` if needed, installs tracked AUR packages, and re-enables tracked user services.
 - `dot_local/share/dotfiles/packages/pacman.txt` and `aur.txt` are curated portable baselines.
 - `dot_local/share/dotfiles/packages/*-snapshot.txt` are exact exports from this machine for reference.
+- OBS tracking currently includes the profile `basic.ini`, but not scene collections, because PipeWire restore tokens are machine-specific and should not be committed raw.
