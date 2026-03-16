@@ -59,7 +59,6 @@ seatd
 snap-pac
 snapper
 spotify-launcher
-starship
 sudo
 swappy
 swayidle

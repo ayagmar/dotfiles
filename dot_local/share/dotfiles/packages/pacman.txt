@@ -12,6 +12,7 @@ chezmoi
 jq
 uv
 nodejs
+mise
 
 # Shell and editor
 zsh
@@ -19,7 +20,6 @@ zsh-autosuggestions
 zsh-syntax-highlighting
 atuin
 zoxide
-starship
 neovim
 less
 nano
@@ -59,6 +59,7 @@ vulkan-icd-loader
 # Wayland workflow tools
 wl-clipboard
 cliphist
+brightnessctl
 swappy
 swayidle
 swaylock

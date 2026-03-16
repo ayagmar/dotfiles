@@ -218,7 +218,7 @@ layout {
 // See the binds section below for more spawn examples.
 
 // Start the shell and auth agent with the compositor session.
-spawn-at-startup "/home/ayagmar/.config/niri/scripts/session-bootstrap.sh"
+spawn-sh-at-startup "\"$HOME/.config/niri/scripts/session-bootstrap.sh\""
 // To run a shell command (with variables, pipes, etc.), use spawn-sh-at-startup:
 // spawn-sh-at-startup "qs -c ~/source/qs/MyAwesomeShell"
 
@@ -327,20 +327,20 @@ binds {
 
     // Suggested binds for running programs: terminal, app launcher, screen locker.
     Mod+Return hotkey-overlay-title="Open a Terminal: Kitty" { spawn "kitty"; }
-    Mod+Space hotkey-overlay-title="Open Noctalia Launcher" { spawn "/home/ayagmar/.config/niri/scripts/noctaliactl" "ipc" "launcher" "toggle"; }
-    Mod+V hotkey-overlay-title="Open Noctalia Clipboard History" { spawn "/home/ayagmar/.config/niri/scripts/noctaliactl" "ipc" "launcher" "clipboard"; }
-    Mod+C hotkey-overlay-title="Open Noctalia ControlCenter" { spawn "/home/ayagmar/.config/niri/scripts/noctaliactl" "ipc" "controlCenter" "toggle"; }
-    Mod+E hotkey-overlay-title="Open Noctalia Emoji Picker" { spawn "/home/ayagmar/.config/niri/scripts/noctaliactl" "ipc" "launcher" "emoji"; }
-    Mod+Alt+C hotkey-overlay-title="Open Noctalia Settings" { spawn "/home/ayagmar/.config/niri/scripts/noctaliactl" "ipc" "settings" "toggle"; }
-    Mod+Alt+N hotkey-overlay-title="Restart Noctalia Shell" { spawn "/home/ayagmar/.config/niri/scripts/noctaliactl" "restart-shell"; }
-    Mod+Shift+W hotkey-overlay-title="Open Noctalia Wallpaper Selector" { spawn "/home/ayagmar/.config/niri/scripts/noctaliactl" "ipc" "wallpaper" "toggle"; }
-    Mod+Ctrl+W hotkey-overlay-title="Toggle Wallpaper Automation" { spawn "/home/ayagmar/.config/niri/scripts/noctaliactl" "ipc" "wallpaper" "toggleAutomation"; }
-    Mod+D hotkey-overlay-title="Toggle Noctalia Dark Mode" { spawn "/home/ayagmar/.config/niri/scripts/noctaliactl" "ipc" "darkMode" "toggle"; }
-    Super+Alt+L hotkey-overlay-title="Open Noctalia Lock Screen" { spawn "/home/ayagmar/.config/niri/scripts/noctaliactl" "ipc" "lockScreen" "lock"; }
-    Super+F9 hotkey-overlay-title="Toggle OBS Recording" { spawn "/home/ayagmar/.config/noctalia/plugins/obs-control/scripts/run-action" "toggle-record"; }
-    Super+F10 hotkey-overlay-title="Toggle OBS Replay Buffer" { spawn "/home/ayagmar/.config/noctalia/plugins/obs-control/scripts/run-action" "toggle-replay"; }
-    Super+F11 hotkey-overlay-title="Save OBS Replay Buffer" { spawn "/home/ayagmar/.config/noctalia/plugins/obs-control/scripts/run-action" "save-replay"; }
-    Super+F12 hotkey-overlay-title="Launch OBS" { spawn "/home/ayagmar/.config/noctalia/plugins/obs-control/scripts/run-action" "launch"; }
+    Mod+Space hotkey-overlay-title="Open Noctalia Launcher" { spawn-sh "\"$HOME/.config/niri/scripts/noctaliactl\" ipc launcher toggle"; }
+    Mod+V hotkey-overlay-title="Open Noctalia Clipboard History" { spawn-sh "\"$HOME/.config/niri/scripts/noctaliactl\" ipc launcher clipboard"; }
+    Mod+C hotkey-overlay-title="Open Noctalia ControlCenter" { spawn-sh "\"$HOME/.config/niri/scripts/noctaliactl\" ipc controlCenter toggle"; }
+    Mod+E hotkey-overlay-title="Open Noctalia Emoji Picker" { spawn-sh "\"$HOME/.config/niri/scripts/noctaliactl\" ipc launcher emoji"; }
+    Mod+Alt+C hotkey-overlay-title="Open Noctalia Settings" { spawn-sh "\"$HOME/.config/niri/scripts/noctaliactl\" ipc settings toggle"; }
+    Mod+Alt+N hotkey-overlay-title="Restart Noctalia Shell" { spawn-sh "\"$HOME/.config/niri/scripts/noctaliactl\" restart-shell"; }
+    Mod+Shift+W hotkey-overlay-title="Open Noctalia Wallpaper Selector" { spawn-sh "\"$HOME/.config/niri/scripts/noctaliactl\" ipc wallpaper toggle"; }
+    Mod+Ctrl+W hotkey-overlay-title="Toggle Wallpaper Automation" { spawn-sh "\"$HOME/.config/niri/scripts/noctaliactl\" ipc wallpaper toggleAutomation"; }
+    Mod+D hotkey-overlay-title="Toggle Noctalia Dark Mode" { spawn-sh "\"$HOME/.config/niri/scripts/noctaliactl\" ipc darkMode toggle"; }
+    Super+Alt+L hotkey-overlay-title="Open Noctalia Lock Screen" { spawn-sh "\"$HOME/.config/niri/scripts/noctaliactl\" ipc lockScreen lock"; }
+    Super+F9 hotkey-overlay-title="Toggle OBS Recording" { spawn-sh "\"$HOME/.config/noctalia/plugins/obs-control/scripts/run-action\" toggle-record"; }
+    Super+F10 hotkey-overlay-title="Toggle OBS Replay Buffer" { spawn-sh "\"$HOME/.config/noctalia/plugins/obs-control/scripts/run-action\" toggle-replay"; }
+    Super+F11 hotkey-overlay-title="Save OBS Replay Buffer" { spawn-sh "\"$HOME/.config/noctalia/plugins/obs-control/scripts/run-action\" save-replay"; }
+    Super+F12 hotkey-overlay-title="Launch OBS" { spawn-sh "\"$HOME/.config/noctalia/plugins/obs-control/scripts/run-action\" launch"; }
 
     // Use spawn-sh to run a shell command. Do this if you need pipes, multiple commands, etc.
     // Note: the entire command goes as a single argument. It's passed verbatim to `sh -c`.
