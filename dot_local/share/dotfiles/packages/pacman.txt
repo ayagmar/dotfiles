@@ -17,6 +17,8 @@ nodejs
 zsh
 zsh-autosuggestions
 zsh-syntax-highlighting
+atuin
+zoxide
 starship
 neovim
 less

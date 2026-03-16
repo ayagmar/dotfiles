@@ -105,4 +105,11 @@ source $ZSH/oh-my-zsh.sh
 source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
 source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 #eval "$(starship init zsh)"
+if command -v zoxide >/dev/null 2>&1; then
+  eval "$(zoxide init zsh)"
+  alias cd='z'
+fi
+if command -v atuin >/dev/null 2>&1; then
+  eval "$(atuin init zsh)"
+fi
 eval "$(mise activate zsh)"

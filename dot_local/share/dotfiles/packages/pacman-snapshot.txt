@@ -1,9 +1,12 @@
 adw-gtk-theme
 amd-ucode
+atuin
+bandwhich
 base
 base-devel
 bluez
 bluez-utils
+btop
 btrfs-assistant
 btrfs-progs
 chezmoi
@@ -32,12 +35,14 @@ mpv
 nano
 neovim
 networkmanager
+nftables
 niri
 noto-fonts-emoji
 nvidia-open
 nvidia-open-lts
 nvidia-settings
 nvidia-utils
+nvtop
 nwg-look
 obs-studio
 pipewire-alsa
@@ -58,6 +63,7 @@ starship
 sudo
 swappy
 swayidle
+swayimg
 swaylock
 ttf-jetbrains-mono-nerd
 usbutils
@@ -71,6 +77,7 @@ xdg-desktop-portal-wlr
 xdg-user-dirs
 xdg-utils
 xwayland-satellite
+zoxide
 zsh
 zsh-autosuggestions
 zsh-syntax-highlighting
