@@ -4,7 +4,7 @@ set -euo pipefail
 
 config_home="${XDG_CONFIG_HOME:-$HOME/.config}"
 plugin_obsctl="$config_home/noctalia/plugins/obs-control/scripts/obsctl"
-obs_icon="/usr/share/icons/hicolor/scalable/apps/com.obsproject.Studio.svg"
+obs_icon="$config_home/noctalia/plugins/obs-control/assets/obs-logo.svg"
 
 if [[ ! -x "$plugin_obsctl" ]]; then
   echo "obsctl: plugin helper not found at $plugin_obsctl" >&2
