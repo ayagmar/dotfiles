@@ -1,0 +1,14 @@
+[general]
+size = image
+decoration = no
+
+[viewer]
+scale = fit
+transparency = grid
+antialiasing = mks13
+preload = 2
+
+[info]
+show = yes
+info_timeout = 2
+status_timeout = 2
