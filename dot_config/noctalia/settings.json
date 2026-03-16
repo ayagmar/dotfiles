@@ -188,8 +188,7 @@
                     "unreadBadgeColor": "primary"
                 },
                 {
-                    "cpuIntensive": false,
-                    "id": "plugin:obs-status"
+                    "id": "plugin:obs-control"
                 },
                 {
                     "displayMode": "onhover",
@@ -292,7 +291,7 @@
                     "id": "Notifications"
                 },
                 {
-                    "id": "plugin:obs-status"
+                    "id": "plugin:obs-control"
                 },
                 {
                     "id": "PowerProfile"
