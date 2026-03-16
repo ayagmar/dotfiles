@@ -64,6 +64,12 @@ Personal Arch Linux dotfiles for `niri`, Noctalia, Kitty, zsh, and desktop autom
 - `dot_local/bin/executable_dotfiles-bootstrap`
 - `dot_local/bin/executable_dotfiles-refresh-state`
 
+## Root-managed files
+
+- `etc/nftables.conf.tmpl` manages `/etc/nftables.conf`
+- local machine values like `lan_subnet` live in `~/.config/chezmoi/chezmoi.toml` and are not tracked
+- apply root-managed files explicitly, e.g. `chezmoi -D / apply /etc/nftables.conf`
+
 ## Workflow
 
 Edit your real files in `$HOME`, then re-import them into chezmoi:
