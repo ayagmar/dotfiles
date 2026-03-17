@@ -53,7 +53,6 @@ power-profiles-daemon
 qt5ct
 qt6ct
 reflector
-ripgrep
 sbctl
 seahorse
 seatd
@@ -67,6 +66,7 @@ swayimg
 swaylock
 ttf-jetbrains-mono-nerd
 usbutils
+uv
 v4l2loopback-dkms
 vulkan-icd-loader
 wl-clipboard

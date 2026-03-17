@@ -104,8 +104,6 @@ def apply_motherboard(device, color: RGBColor) -> None:
 
     for zone in getattr(device, "zones", []):
         try:
-            # MSI ARGB headers can come up with zero-sized zones; resize them
-            # before color writes so OpenRGB exposes a stable direct-control path.
             if len(getattr(zone, "leds", [])) == 0:
                 zone.resize(1)
                 time.sleep(0.15)
@@ -122,8 +120,6 @@ def apply_gpu(device, color: RGBColor) -> None:
 
 
 def apply_with_client(device_type: DeviceType, pattern: str, apply_fn, color: RGBColor) -> None:
-    # Some controllers are flaky enough that isolating writes per connection is
-    # more reliable than sharing one SDK session across all devices.
     client = connect_client()
     try:
         device = find_first_by_type(client, device_type, pattern)

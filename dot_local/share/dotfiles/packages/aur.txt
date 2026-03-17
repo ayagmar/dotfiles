@@ -3,4 +3,3 @@
 yay
 noctalia-shell
 openrgb-git
-python-openrgb-git

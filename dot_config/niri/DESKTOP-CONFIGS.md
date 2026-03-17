@@ -16,9 +16,6 @@ This machine's desktop-related config is mostly XDG-clean.
   - Active Noctalia color scheme source.
 - `~/.config/noctalia/plugins.json`
   - Noctalia plugin enablement/config.
-- `~/.config/xdg-desktop-portal/niri-portals.conf`
-  - User override for portal routing on Niri.
-  - Keep `ScreenCast` and `Screenshot` on `wlr` for OBS/PipeWire capture; default `gnome`/`gtk` routing was tested and caused black capture on this machine.
 - `~/.config/kitty/kitty.conf`
   - Terminal config.
 - `~/.config/kitty/themes/noctalia.conf`
