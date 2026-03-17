@@ -189,16 +189,6 @@
                 },
                 {
                     "cpuIntensive": false,
-                    "defaultSettings": {
-                        "leftClickAction": "panel",
-                        "pollIntervalMs": 2500,
-                        "showBarWhenRecording": true,
-                        "showBarWhenReplay": false,
-                        "showControlCenterWhenReady": false,
-                        "showControlCenterWhenRecording": true,
-                        "showControlCenterWhenReplay": true,
-                        "videosPath": ""
-                    },
                     "id": "plugin:obs-control"
                 },
                 {

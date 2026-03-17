@@ -6,11 +6,6 @@
 // Input device configuration.
 // Find the full list of options on the wiki:
 // https://yalter.github.io/niri/Configuration:-Input
-environment {
-    QT_QPA_PLATFORMTHEME "qt6ct"
-    XDG_SESSION_CLASS "user"
-}
-
 input {
     keyboard {
         xkb {
@@ -338,10 +333,10 @@ binds {
     Mod+Ctrl+W hotkey-overlay-title="Toggle Wallpaper Automation" { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "wallpaper" "toggleAutomation"; }
     Mod+D hotkey-overlay-title="Toggle Noctalia Dark Mode" { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "darkMode" "toggle"; }
     Super+Alt+L hotkey-overlay-title="Open Noctalia Lock Screen" { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "lockScreen" "lock"; }
-    Super+F9 hotkey-overlay-title="Toggle OBS Recording" { spawn-sh "\"$HOME/.config/noctalia/plugins/obs-control/scripts/run-action\" toggle-record"; }
-    Super+F10 hotkey-overlay-title="Toggle OBS Replay Buffer" { spawn-sh "\"$HOME/.config/noctalia/plugins/obs-control/scripts/run-action\" toggle-replay"; }
-    Super+F11 hotkey-overlay-title="Save OBS Replay Buffer" { spawn-sh "\"$HOME/.config/noctalia/plugins/obs-control/scripts/run-action\" save-replay"; }
-    Super+F12 hotkey-overlay-title="Launch OBS" { spawn-sh "\"$HOME/.config/noctalia/plugins/obs-control/scripts/run-action\" launch"; }
+    Super+F9 hotkey-overlay-title="Toggle OBS Recording" { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "plugin:obs-control" "toggleRecord"; }
+    Super+F10 hotkey-overlay-title="Toggle OBS Replay Buffer" { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "plugin:obs-control" "toggleReplay"; }
+    Super+F11 hotkey-overlay-title="Save OBS Replay Buffer" { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "plugin:obs-control" "saveReplay"; }
+    Super+F12 hotkey-overlay-title="Launch OBS" { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "plugin:obs-control" "launchObs"; }
 
     // Use spawn-sh to run a shell command. Do this if you need pipes, multiple commands, etc.
     // Note: the entire command goes as a single argument. It's passed verbatim to `sh -c`.
