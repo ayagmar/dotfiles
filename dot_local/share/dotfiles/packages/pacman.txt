@@ -10,8 +10,7 @@ git
 github-cli
 chezmoi
 jq
-uv
-nodejs
+ripgrep
 mise
 
 # Shell and editor

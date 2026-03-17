@@ -5,6 +5,7 @@ Personal Arch Linux dotfiles for `niri`, Noctalia, Kitty, zsh, and desktop autom
 ## Repo map
 
 - `dot_zshrc`
+- `.chezmoiexternal.toml`
 - `dot_gitconfig`
 - `dot_local/bin`
   - `dotfiles-bootstrap`
@@ -12,7 +13,7 @@ Personal Arch Linux dotfiles for `niri`, Noctalia, Kitty, zsh, and desktop autom
 - `dot_config/atuin`
   - minimal shared Atuin config
 - `dot_config/mise`
-  - tracked tool versions for shell bootstrap
+  - tracked tool versions for shell/bootstrap language runtimes
 - `dot_local/share/dotfiles`
   - curated bootstrap package manifests
   - exact package snapshot manifests
@@ -109,6 +110,8 @@ chezmoi init --apply ayagmar/dotfiles
 Notes:
 
 - `dotfiles-bootstrap` installs the tracked native packages, installs `yay` if needed, installs tracked AUR packages, and re-enables tracked user services.
+- `chezmoi` externals install and refresh `~/.oh-my-zsh` from the upstream repository.
+- `mise` is the tracked owner for user-level toolchains like `node`, `pnpm`, `go`, and `uv`.
 - `dot_local/share/dotfiles/packages/pacman.txt` and `aur.txt` are curated portable baselines.
 - `dot_local/share/dotfiles/packages/*-snapshot.txt` are exact exports from this machine for reference.
 - log into Niri through the packaged Wayland session (`niri.desktop` -> `niri-session`), not a shell `exec niri --session` hack in `~/.zprofile`.
