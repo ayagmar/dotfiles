@@ -35,7 +35,7 @@ def read_accent_color() -> RGBColor:
 
 def start_server() -> None:
     subprocess.run(
-        ["systemctl", "--user", "start", "openrgb-server.service"],
+        ["systemctl", "--user", "start", "--no-block", "openrgb-server.service"],
         check=False,
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,

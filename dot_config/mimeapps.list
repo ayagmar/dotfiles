@@ -1,5 +1,6 @@
 
 [Default Applications]
+inode/directory=org.gnome.Nautilus.desktop
 x-scheme-handler/discord=vesktop.desktop
 text/html=helium.desktop
 x-scheme-handler/http=helium.desktop

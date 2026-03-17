@@ -427,7 +427,7 @@
         "screenLock": "",
         "screenUnlock": "~/.config/noctalia/scripts/apply-openrgb-theme.py >/dev/null 2>&1 || true",
         "session": "",
-        "startup": "",
+        "startup": "bash ~/.config/noctalia/scripts/theme-sync.sh --source startup",
         "wallpaperChange": "bash ~/.config/noctalia/scripts/theme-sync.sh --source wallpaper-change"
     },
     "idle": {

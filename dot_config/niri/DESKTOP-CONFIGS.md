@@ -30,10 +30,10 @@ This machine's desktop-related config is mostly XDG-clean.
 
 ## Service state
 
+- `~/.config/systemd/user/niri.service.wants/openrgb-server.service`
+  - User-level enablement link for the OpenRGB SDK server.
 - `~/.config/systemd/user/graphical-session.target.wants/xwayland-satellite.service`
   - User-level enablement link for Xwayland on Niri.
-- `~/.config/systemd/user/graphical-session.target.wants/noctalia-theme-sync-start.service`
-  - User-level enablement link for the one-shot session-start theme sync.
 
 ## Defaults shipped by packages
 
