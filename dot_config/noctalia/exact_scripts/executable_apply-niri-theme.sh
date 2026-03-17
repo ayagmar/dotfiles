@@ -8,6 +8,16 @@ settings_path="$config_dir/noctalia/settings.json"
 niri_theme_path="$config_dir/niri/noctalia-overrides.kdl"
 kitty_mode_path="$config_dir/kitty/kitty-mode.conf"
 
+if ! command -v jq >/dev/null 2>&1; then
+  exit 0
+fi
+
+if [[ ! -r "$colors_path" || ! -r "$settings_path" ]]; then
+  exit 0
+fi
+
+mkdir -p "$(dirname "$niri_theme_path")" "$(dirname "$kitty_mode_path")"
+
 secondary="$(jq -r '.mSecondary' "$colors_path")"
 surface="$(jq -r '.mSurface' "$colors_path")"
 outline="$(jq -r '.mOutline' "$colors_path")"
@@ -22,8 +32,8 @@ fi
 
 if [[ "$is_dark" == "true" ]]; then
   background_color="transparent"
-  kitty_background_opacity="0.90"
-  kitty_background_blur="16"
+  kitty_background_opacity="0.94"
+  kitty_background_blur="20"
 else
   background_color="$surface"
   kitty_background_opacity="1.0"

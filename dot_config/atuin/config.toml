@@ -1,2 +1,5 @@
 auto_sync = false
 enter_accept = true
+
+[theme]
+name = "noctalia"
