@@ -1,0 +1,14 @@
+{
+  "lastChangelogVersion": "0.59.0",
+  "packages": [
+    "npm:pi-codex-web-search",
+    "npm:pi-promptsmith",
+    "npm:pi-extmgr",
+    "npm:pi-multi-pass"
+  ],
+  "defaultProvider": "Outlook",
+  "defaultModel": "gpt-5.4",
+  "defaultThinkingLevel": "high",
+  "hideThinkingBlock": false,
+  "theme": "noctalia"
+}
