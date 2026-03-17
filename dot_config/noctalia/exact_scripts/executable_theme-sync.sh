@@ -4,7 +4,7 @@ set -euo pipefail
 
 config_dir="${XDG_CONFIG_HOME:-$HOME/.config}"
 niri_sync="$config_dir/noctalia/scripts/apply-niri-theme.sh"
-openrgb_sync="$config_dir/noctalia/scripts/apply-openrgb-theme.sh"
+openrgb_sync="$config_dir/noctalia/scripts/apply-openrgb-theme.py"
 
 dark_mode=""
 source_name=""
@@ -45,4 +45,4 @@ if command -v niri >/dev/null 2>&1 && [[ -n "${NIRI_SOCKET:-}" ]]; then
   niri msg action load-config-file >/dev/null 2>&1 || true
 fi
 
-bash "$openrgb_sync"
+"$openrgb_sync"

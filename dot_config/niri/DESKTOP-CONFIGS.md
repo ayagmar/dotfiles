@@ -24,13 +24,16 @@ This machine's desktop-related config is mostly XDG-clean.
   - Vesktop client settings.
 - `~/.local/share/applications/vesktop.desktop`
   - Local launcher override forcing native Wayland flags.
-- `~/.zprofile`
-  - Auto-starts `niri --session` on `tty1`.
+- `/usr/share/wayland-sessions/niri.desktop`
+  - Packaged Niri session entry.
+  - Starts `niri-session`, which in turn activates `niri.service` and `graphical-session.target`.
 
 ## Service state
 
 - `~/.config/systemd/user/graphical-session.target.wants/xwayland-satellite.service`
   - User-level enablement link for Xwayland on Niri.
+- `~/.config/systemd/user/graphical-session.target.wants/noctalia-theme-sync-start.service`
+  - User-level enablement link for the one-shot session-start theme sync.
 
 ## Defaults shipped by packages
 
@@ -62,7 +65,6 @@ For a clean desktop backup, keep these:
 - `~/.config/gtk-3.0/` if you later add GTK theming there
 - `~/.config/systemd/user/`
 - `~/.local/share/applications/`
-- `~/.zprofile`
 
 Optional:
 

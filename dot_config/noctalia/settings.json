@@ -12,7 +12,7 @@
         "enableSessionSearch": true,
         "enableSettingsSearch": true,
         "enableWindowsSearch": true,
-        "iconMode": "tabler",
+        "iconMode": "native",
         "ignoreMouseInput": false,
         "overviewLayer": true,
         "pinnedApps": [
@@ -425,7 +425,7 @@
         "performanceModeDisabled": "",
         "performanceModeEnabled": "",
         "screenLock": "",
-        "screenUnlock": "bash ~/.config/noctalia/scripts/apply-openrgb-theme.sh >/dev/null 2>&1 || true",
+        "screenUnlock": "~/.config/noctalia/scripts/apply-openrgb-theme.py >/dev/null 2>&1 || true",
         "session": "",
         "startup": "",
         "wallpaperChange": "bash ~/.config/noctalia/scripts/theme-sync.sh --source wallpaper-change"

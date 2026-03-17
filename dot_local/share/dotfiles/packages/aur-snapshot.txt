@@ -1,6 +1,7 @@
 helium-browser-bin
 noctalia-shell
 openrgb-git
+python-openrgb-git
 vesktop
 yay
 yay-debug

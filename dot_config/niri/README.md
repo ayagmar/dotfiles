@@ -6,20 +6,22 @@ This directory contains the local `niri` layer for the desktop session.
 
 - [`config.kdl`](/home/ayagmar/.config/niri/config.kdl): compositor config, keybinds, startup, window rules
 - [`scripts/noctaliactl`](/home/ayagmar/.config/niri/scripts/noctaliactl): Quickshell/Noctalia control and restart helper
-- [`scripts/session-bootstrap.sh`](/home/ayagmar/.config/niri/scripts/session-bootstrap.sh): session startup owner for `niri`
 - [`../noctalia/scripts/theme-sync.sh`](/home/ayagmar/.config/noctalia/scripts/theme-sync.sh): single theme sync entrypoint
 - [`../noctalia/scripts/apply-niri-theme.sh`](/home/ayagmar/.config/noctalia/scripts/apply-niri-theme.sh): writes `niri`/Kitty theme outputs
-- [`../noctalia/scripts/apply-openrgb-theme.sh`](/home/ayagmar/.config/noctalia/scripts/apply-openrgb-theme.sh): applies RGB theme through local `openrgb --noautoconnect` CLI calls
+- [`../noctalia/scripts/apply-openrgb-theme.py`](/home/ayagmar/.config/noctalia/scripts/apply-openrgb-theme.py): applies RGB theme through the OpenRGB SDK via Python
+- [`../systemd/user/noctalia-theme-sync-start.service`](/home/ayagmar/.config/systemd/user/noctalia-theme-sync-start.service): runs one initial theme sync when the graphical session comes up
 - [`../systemd/user/noctalia-theme-sync.path`](/home/ayagmar/.config/systemd/user/noctalia-theme-sync.path): watches theme color changes
 
 ## Startup Flow
 
-`niri` starts one bootstrap script:
+`niri` starts Noctalia directly:
 
-- import session environment into user systemd
-- start the polkit agent if missing
-- start Noctalia shell from the compositor session
-- run one initial theme sync for `niri` + Kitty + RGB
+- `spawn-at-startup "qs" "-c" "noctalia-shell" "--no-duplicate"`
+
+Other startup ownership stays official:
+
+- the polkit agent comes from the packaged desktop autostart/service
+- one initial theme sync comes from the user systemd oneshot service
 
 ## Theme Sync Flow
 
@@ -31,7 +33,7 @@ It is used by:
 
 - Noctalia hooks in `settings.json`
 - the theme color watcher path unit
-- the `niri` session bootstrap script
+- the graphical-session start oneshot
 
 ## Recovery
 
@@ -40,6 +42,7 @@ It is used by:
 ## Maintenance
 
 - Prefer updating `theme-sync.sh` for future theme-driven behavior
-- Prefer updating `session-bootstrap.sh` for future session-start behavior
+- Keep session startup on upstream-owned paths where possible
 - Keep machine-specific logic isolated in small helper scripts
-- GPU RGB is intentionally not synced until the local OpenRGB GPU path is stable again
+- RGB sync currently covers the GPU, keyboard, and motherboard headers through the OpenRGB SDK helper
+- Corsair RAM is not part of the sync yet because OpenRGB is not exposing a DRAM controller on this machine

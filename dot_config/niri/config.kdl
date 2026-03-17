@@ -217,8 +217,8 @@ layout {
 // which may be more convenient to use.
 // See the binds section below for more spawn examples.
 
-// Start the shell and auth agent with the compositor session.
-spawn-sh-at-startup "\"$HOME/.config/niri/scripts/session-bootstrap.sh\""
+// Start Noctalia the way its upstream docs recommend for Niri.
+spawn-at-startup "qs" "-c" "noctalia-shell" "--no-duplicate"
 // To run a shell command (with variables, pipes, etc.), use spawn-sh-at-startup:
 // spawn-sh-at-startup "qs -c ~/source/qs/MyAwesomeShell"
 

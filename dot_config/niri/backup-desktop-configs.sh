@@ -12,7 +12,6 @@ includes=(
   ".config/gtk-3.0"
   ".config/systemd/user"
   ".local/share/applications"
-  ".zprofile"
 )
 
 optional_includes=()

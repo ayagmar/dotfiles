@@ -1,4 +1,6 @@
 noctalia-theme-sync.path
+noctalia-theme-sync-start.service
+openrgb-server.service
 wireplumber.service
 xdg-user-dirs.service
 xwayland-satellite.service
