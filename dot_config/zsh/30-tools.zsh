@@ -1,4 +1,7 @@
 if [[ -r /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh ]]; then
+  # Brighter autosuggestion color for Noctalia/kitty theme
+  # You can tweak this later (e.g. fg=#d2d6ff for even brighter)
+  export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#9ea3d6"
   source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
 fi
 
