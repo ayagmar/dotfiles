@@ -1,9 +1,10 @@
-noctalia-theme-sync.path
-noctalia-theme-sync-start.service
-wireplumber.service
-xdg-user-dirs.service
-xwayland-satellite.service
 gnome-keyring-daemon.socket
+noctalia-theme-sync-start.service
+noctalia-theme-sync.path
+openrgb-server.service
 p11-kit-server.socket
 pipewire-pulse.socket
 pipewire.socket
+wireplumber.service
+xdg-user-dirs.service
+xwayland-satellite.service
