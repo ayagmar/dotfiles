@@ -5,7 +5,7 @@ This directory contains the local `niri` layer for the desktop session.
 ## Ownership
 
 - [`config.kdl`](/home/ayagmar/.config/niri/config.kdl): compositor config, keybinds, startup, window rules
-- [`scripts/noctaliactl`](/home/ayagmar/.config/niri/scripts/noctaliactl): Quickshell/Noctalia control and restart helper
+- [`scripts/noctaliactl`](/home/ayagmar/.config/niri/scripts/noctaliactl): small Noctalia start/restart helper; regular shell actions use direct `qs -c noctalia-shell ipc call ...` binds
 - [`../noctalia/scripts/theme-sync.sh`](/home/ayagmar/.config/noctalia/scripts/theme-sync.sh): single theme sync entrypoint
 - [`../noctalia/scripts/apply-niri-theme.sh`](/home/ayagmar/.config/noctalia/scripts/apply-niri-theme.sh): writes `niri`/Kitty theme outputs
 - [`../noctalia/scripts/apply-openrgb-theme.py`](/home/ayagmar/.config/noctalia/scripts/apply-openrgb-theme.py): applies RGB theme through the OpenRGB SDK via Python
@@ -44,5 +44,6 @@ It is used by:
 - Prefer updating `theme-sync.sh` for future theme-driven behavior
 - Keep session startup on upstream-owned paths where possible
 - Keep machine-specific logic isolated in small helper scripts
+- Prefer direct `qs -c noctalia-shell ipc call ...` binds for Noctalia actions, matching upstream docs
 - RGB sync currently covers the GPU, keyboard, and motherboard headers through the OpenRGB SDK helper
 - Corsair RAM is not part of the sync yet because OpenRGB is not exposing a DRAM controller on this machine

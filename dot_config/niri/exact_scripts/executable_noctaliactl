@@ -39,16 +39,6 @@ restart_shell() {
   start_shell
 }
 
-ipc_call() {
-  if [[ $# -lt 2 ]]; then
-    echo "usage: noctaliactl ipc <service> <action> [args...]" >&2
-    exit 2
-  fi
-
-  start_shell
-  qs ipc -c noctalia-shell --any-display call "$@"
-}
-
 case "${1:-}" in
   start-shell)
     start_shell
@@ -56,12 +46,8 @@ case "${1:-}" in
   restart-shell)
     restart_shell
     ;;
-  ipc)
-    shift
-    ipc_call "$@"
-    ;;
   *)
-    echo "usage: noctaliactl <start-shell|restart-shell|ipc ...>" >&2
+    echo "usage: noctaliactl <start-shell|restart-shell>" >&2
     exit 2
     ;;
 esac

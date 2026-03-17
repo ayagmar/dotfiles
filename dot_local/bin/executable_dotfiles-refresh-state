@@ -8,8 +8,8 @@ systemd_dir="${repo_dir}/dot_local/share/dotfiles/systemd"
 
 mkdir -p "$packages_dir" "$systemd_dir"
 
-pacman -Qqen > "${packages_dir}/pacman-snapshot.txt"
-pacman -Qqem > "${packages_dir}/aur-snapshot.txt"
-systemctl --user list-unit-files --state=enabled --no-legend | awk '{print $1}' > "${systemd_dir}/user-enabled.txt"
+pacman -Qqen | sort > "${packages_dir}/pacman-snapshot.txt"
+pacman -Qqem | sort > "${packages_dir}/aur-snapshot.txt"
+systemctl --user list-unit-files --state=enabled --no-legend | awk '{print $1}' | sort > "${systemd_dir}/user-enabled.txt"
 
 printf 'Refreshed package and user-service manifests in %s\n' "$repo_dir"

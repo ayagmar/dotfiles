@@ -10,6 +10,7 @@ Personal Arch Linux dotfiles for `niri`, Noctalia, Kitty, zsh, and desktop autom
 - `dot_local/bin`
   - `dotfiles-bootstrap`
   - `dotfiles-refresh-state`
+  - `dotfiles-sync`
 - `dot_config/atuin`
   - minimal shared Atuin config
 - `dot_config/mise`
@@ -60,11 +61,11 @@ Personal Arch Linux dotfiles for `niri`, Noctalia, Kitty, zsh, and desktop autom
 ## Important local entrypoints
 
 - `dot_config/niri/exact_scripts/executable_noctaliactl`
-- `dot_config/niri/exact_scripts/executable_obsctl`
 - `dot_config/noctalia/exact_scripts/executable_theme-sync.sh`
 - `dot_config/noctalia/exact_scripts/executable_apply-openrgb-theme.py`
 - `dot_local/bin/executable_dotfiles-bootstrap`
 - `dot_local/bin/executable_dotfiles-refresh-state`
+- `dot_local/bin/executable_dotfiles-sync`
 
 ## Root-managed files
 
@@ -74,12 +75,19 @@ Personal Arch Linux dotfiles for `niri`, Noctalia, Kitty, zsh, and desktop autom
 
 ## Workflow
 
-Edit your real files in `$HOME`, then re-import them into chezmoi:
+Edit your real files in `$HOME`.
+
+For existing managed files, use the sync helper:
 
 ```bash
-chezmoi add ~/.zshrc
-chezmoi add ~/.config/niri/config.kdl
-chezmoi add ~/.config/noctalia/settings.json
+~/.local/bin/dotfiles-sync
+```
+
+For brand new files that are not managed yet, add them first:
+
+```bash
+chezmoi add ~/.config/some/new-file
+~/.local/bin/dotfiles-sync
 ```
 
 Review and push:
@@ -92,7 +100,7 @@ git -C ~/.local/share/chezmoi commit -m "Update dotfiles"
 git -C ~/.local/share/chezmoi push
 ```
 
-If you changed installed packages or enabled user services, refresh the exact snapshot manifests too:
+If you only want to refresh exact package and user-service manifests:
 
 ```bash
 ~/.local/bin/dotfiles-refresh-state
@@ -110,12 +118,14 @@ chezmoi init --apply ayagmar/dotfiles
 Notes:
 
 - `dotfiles-bootstrap` installs the tracked native packages, installs `yay` if needed, installs tracked AUR packages, and re-enables tracked user services.
+- `dotfiles-sync` is the one-command live-to-chezmoi workflow: `chezmoi re-add`, snapshot refresh, config validation, and `chezmoi apply`.
 - `chezmoi` externals install and refresh `~/.oh-my-zsh` from the upstream repository.
 - `mise` is the tracked owner for user-level toolchains like `node`, `pnpm`, `go`, and `uv`.
 - `dot_local/share/dotfiles/packages/pacman.txt` and `aur.txt` are curated portable baselines.
 - `dot_local/share/dotfiles/packages/*-snapshot.txt` are exact exports from this machine for reference.
 - log into Niri through the packaged Wayland session (`niri.desktop` -> `niri-session`), not a shell `exec niri --session` hack in `~/.zprofile`.
 - `niri` starts `noctalia-shell` directly via `spawn-at-startup`; the one-shot session theme sync is a user systemd service.
+- validate `niri` against the live target path `~/.config/niri/config.kdl`, not the raw `chezmoi` source copy, because the live config includes generated `noctalia.kdl` files that are intentionally not tracked.
 - RGB theme sync currently manages the GPU, keyboard, and motherboard headers through the OpenRGB SDK. Corsair RAM is not synced until OpenRGB exposes it on this machine.
 - `~/.config/xdg-desktop-portal/niri-portals.conf` is intentionally tracked on this machine.
 - for this Niri + OBS setup, `wlr` must handle `ScreenCast` and `Screenshot`; leaving everything on the distro `gnome`/`gtk` defaults caused OBS PipeWire capture to come up black.

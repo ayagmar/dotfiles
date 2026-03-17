@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+repo_dir="${HOME}/.local/share/chezmoi"
+
+require_cmd() {
+    if ! command -v "$1" >/dev/null 2>&1; then
+        printf 'Missing required command: %s\n' "$1" >&2
+        exit 1
+    fi
+}
+
+require_cmd chezmoi
+require_cmd git
+
+# Re-import all modified managed files from the live target tree.
+chezmoi re-add
+
+# Refresh exact machine snapshots tracked in the source repo.
+"${HOME}/.local/bin/dotfiles-refresh-state"
+
+# Validate live config files. Source niri config intentionally includes generated
+# files that only exist in the target tree, so validate the real target path.
+if command -v niri >/dev/null 2>&1 && [[ -f "${HOME}/.config/niri/config.kdl" ]]; then
+    niri validate -c "${HOME}/.config/niri/config.kdl" >/dev/null
+fi
+
+if command -v jq >/dev/null 2>&1; then
+    jq empty \
+        "${HOME}/.config/noctalia/settings.json" \
+        "${HOME}/.config/noctalia/plugins.json"
+fi
+
+# Bring generated snapshot files back into the target tree too.
+chezmoi apply --force
+
+git -C "$repo_dir" status --short --branch
