@@ -2,30 +2,30 @@
   "$schema": "https://raw.githubusercontent.com/badlogic/pi-mono/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json",
   "name": "noctalia-catppuccin",
   "vars": {
-    "bg": "#1e1e2e",
-    "surface": "#313244",
-    "surfaceAlt": "#2b2c3d",
-    "surfaceRaised": "#414256",
-    "surfaceTint": "#51474f",
-    "outline": "#4c4f69",
-    "outlineSoft": "#686d88",
-    "muted": "#a3b4eb",
-    "dim": "#8693c1",
-    "text": "#cdd6f4",
+    "bg": "#0b0e14",
+    "surface": "#1e222a",
+    "surfaceAlt": "#181c23",
+    "surfaceRaised": "#30343a",
+    "surfaceTint": "#343f2f",
+    "outline": "#565b66",
+    "outlineSoft": "#71757b",
+    "muted": "#8e959e",
+    "dim": "#717780",
+    "text": "#d1d1c7",
 
-    "primary": "#cba6f7",
-    "primaryBright": "#cbaef7",
-    "secondary": "#fab387",
-    "secondaryBright": "#f5b794",
-    "tertiary": "#94e2d5",
-    "tertiaryBright": "#9be1d9",
-    "successTone": "#94e2d5",
-    "successBright": "#9be1d9",
-    "errorColor": "#f38ba8",
-    "errorBright": "#f091ae",
-    "shadow": "#11111b",
-    "toolSuccess": "#3b4452",
-    "toolError": "#483d50"
+    "primary": "#e6b450",
+    "primaryBright": "#e3b963",
+    "secondary": "#aad94c",
+    "secondaryBright": "#afd85b",
+    "tertiary": "#39bae6",
+    "tertiaryBright": "#4bbde2",
+    "successTone": "#aad94c",
+    "successBright": "#afd85b",
+    "errorColor": "#d95757",
+    "errorBright": "#d86160",
+    "shadow": "#000000",
+    "toolSuccess": "#2c342d",
+    "toolError": "#34282f"
   },
   "colors": {
     "accent": "secondaryBright",
@@ -87,8 +87,8 @@
     "bashMode": "primaryBright"
   },
   "export": {
-    "pageBg": "#1e1e2e",
-    "cardBg": "#313244",
-    "infoBg": "#11111b"
+    "pageBg": "#0b0e14",
+    "cardBg": "#1e222a",
+    "infoBg": "#000000"
   }
 }
