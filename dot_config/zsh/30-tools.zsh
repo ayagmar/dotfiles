@@ -1,3 +1,8 @@
+path=("$HOME/.local/bin" $path)
+typeset -U path PATH
+
+alias prename='project-rename'
+
 if [[ -r /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh ]]; then
   # Brighter autosuggestion color for Noctalia/kitty theme
   # You can tweak this later (e.g. fg=#d2d6ff for even brighter)
