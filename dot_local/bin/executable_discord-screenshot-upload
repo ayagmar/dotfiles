@@ -1,0 +1,151 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/discord-screenshot"
+WEBHOOK_URL_FILE="$CONFIG_DIR/webhook-url"
+DISPLAY_NAME='kitten'
+TEMP_SCREENSHOT_PATH=''
+SCREENSHOT_PATH=''
+UPLOAD_FILENAME=''
+
+require_cmd() {
+    if ! command -v "$1" >/dev/null 2>&1; then
+        printf 'Missing required command: %s\n' "$1" >&2
+        exit 1
+    fi
+}
+
+usage() {
+    printf 'usage: %s [png-path]\n' "$(basename "$0")" >&2
+}
+
+cleanup() {
+    if [[ -n "$TEMP_SCREENSHOT_PATH" && -f "$TEMP_SCREENSHOT_PATH" ]]; then
+        rm -f -- "$TEMP_SCREENSHOT_PATH"
+    fi
+}
+
+build_upload_filename() {
+    printf 'kitten-shot-%s.png\n' "$(date +%Y-%m-%d-%H-%M-%S)"
+}
+
+capture_screenshot() {
+    require_cmd grim
+    require_cmd mktemp
+
+    TEMP_SCREENSHOT_PATH="$(mktemp --tmpdir=/tmp discord-screenshot-XXXXXX.png)"
+    grim "$TEMP_SCREENSHOT_PATH"
+    SCREENSHOT_PATH="$TEMP_SCREENSHOT_PATH"
+    UPLOAD_FILENAME="$(build_upload_filename)"
+}
+
+resolve_inputs() {
+    case "$#" in
+        0)
+            capture_screenshot
+            ;;
+        1)
+            SCREENSHOT_PATH="$1"
+            UPLOAD_FILENAME="$(build_upload_filename)"
+            ;;
+        *)
+            usage
+            exit 2
+            ;;
+    esac
+}
+
+ensure_png_file() {
+    local path="$1"
+    local mime_type
+
+    if [[ ! -f "$path" ]]; then
+        printf 'Screenshot not found: %s\n' "$path" >&2
+        exit 1
+    fi
+
+    mime_type="$(file --brief --mime-type "$path")"
+    if [[ "$mime_type" != 'image/png' ]]; then
+        printf 'Expected a PNG file, got %s: %s\n' "$mime_type" "$path" >&2
+        exit 1
+    fi
+}
+
+load_webhook_url() {
+    if [[ -n "${DISCORD_SCREENSHOT_WEBHOOK_URL:-}" ]]; then
+        printf '%s' "$DISCORD_SCREENSHOT_WEBHOOK_URL"
+        return
+    fi
+
+    if [[ ! -f "$WEBHOOK_URL_FILE" ]]; then
+        printf 'Missing webhook URL. Set DISCORD_SCREENSHOT_WEBHOOK_URL or create %s\n' "$WEBHOOK_URL_FILE" >&2
+        exit 1
+    fi
+
+    tr -d '\r\n' < "$WEBHOOK_URL_FILE"
+}
+
+build_post_url() {
+    local webhook_url="$1"
+
+    if [[ "$webhook_url" == *\?* ]]; then
+        printf '%s&wait=true\n' "$webhook_url"
+        return
+    fi
+
+    printf '%s?wait=true\n' "$webhook_url"
+}
+
+build_payload_json() {
+    local upload_filename="$1"
+
+    jq -cn \
+        --arg username "$DISPLAY_NAME" \
+        --arg filename "$upload_filename" \
+        '{username: $username, attachments: [{id: 0, filename: $filename}]}'
+}
+
+upload_screenshot() {
+    local screenshot_path="$1"
+    local upload_filename="$2"
+    local webhook_url="$3"
+
+    curl \
+        --silent \
+        --show-error \
+        --fail-with-body \
+        -F "payload_json=$(build_payload_json "$upload_filename")" \
+        -F "files[0]=@${screenshot_path};type=image/png;filename=${upload_filename}" \
+        "$(build_post_url "$webhook_url")"
+}
+
+main() {
+    require_cmd curl
+    require_cmd file
+    require_cmd jq
+
+    trap cleanup EXIT
+
+    local webhook_url
+    local response
+    local uploaded_name
+    local uploaded_username
+
+    resolve_inputs "$@"
+    ensure_png_file "$SCREENSHOT_PATH"
+
+    webhook_url="$(load_webhook_url)"
+    response="$(upload_screenshot "$SCREENSHOT_PATH" "$UPLOAD_FILENAME" "$webhook_url")"
+    uploaded_name="$(jq -r '.attachments[0].filename // empty' <<<"$response")"
+    uploaded_username="$(jq -r '.author.username // .username // empty' <<<"$response")"
+
+    if [[ "$uploaded_name" != "$UPLOAD_FILENAME" ]]; then
+        printf 'Upload succeeded but Discord returned filename %q instead of %q\n' "$uploaded_name" "$UPLOAD_FILENAME" >&2
+        exit 1
+    fi
+
+    printf 'Uploaded %s as %s via %s\n' "$SCREENSHOT_PATH" "$uploaded_name" "${uploaded_username:-$DISPLAY_NAME}"
+}
+
+main "$@"

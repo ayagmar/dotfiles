@@ -499,6 +499,7 @@ binds {
     Mod+Shift+S { screenshot; }
     Mod+Ctrl+S  { screenshot-screen; }
     Mod+Alt+S { screenshot-window; }
+    F9 hotkey-overlay-title="Capture and Upload Screenshot to Discord" { spawn "/home/ayagmar/.local/bin/discord-screenshot-upload"; }
 
     // Applications such as remote-desktop clients and software KVM switches may
     // request that niri stops processing the keyboard shortcuts defined here

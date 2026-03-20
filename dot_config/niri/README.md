@@ -29,12 +29,25 @@ Other startup ownership stays upstream-owned:
 Noctalia owns theme rendering:
 
 - built-in Noctalia templates render `niri`, `kitty`, `gtk`, `qt`, `btop`, `code`, and `discord`
-- local Noctalia user templates render Pi and Atuin
+- local Noctalia user templates render Pi, Atuin, and Macchina
 - Noctalia's built-in `colorGeneration` hook applies OpenRGB after colors/templates are ready
 
 ## Recovery
 
 - `Mod+Alt+N`: restart Noctalia shell
+- `F9`: capture a fresh screenshot and upload it to Discord with `~/.local/bin/discord-screenshot-upload`
+
+## Local Secrets
+
+- `~/.config/discord-screenshot/webhook-url`: Discord webhook used by the screenshot uploader
+- current runtime path stays the same whether the secret is local-only or managed by chezmoi
+- for portable sync, prefer a chezmoi-encrypted managed file or password-manager-backed template instead of plaintext tracked files
+
+## Discord Screenshot Upload
+
+- Standard Niri screenshot binds stay local-only: `Mod+Shift+S`, `Mod+Ctrl+S`, and `Mod+Alt+S`
+- `F9` is the only bind that uploads to Discord
+- the webhook posts as `kitten`; the avatar source image lives at `~/.config/discord-screenshot/kitten-avatar.jpg`
 
 ## Maintenance
 
