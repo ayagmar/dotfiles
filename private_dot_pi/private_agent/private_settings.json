@@ -6,7 +6,7 @@
     "npm:pi-extmgr",
     "npm:pi-multi-pass"
   ],
-  "defaultProvider": "openai-codex",
+  "defaultProvider": "openai-codex-2",
   "defaultModel": "gpt-5.4",
   "defaultThinkingLevel": "high",
   "hideThinkingBlock": false,
