@@ -1,0 +1,14 @@
+[theme]
+name = "noctalia"
+parent = "default"
+
+[colors]
+Base = "{{colors.on_surface.default.hex}}"
+Title = "{{colors.primary.default.hex}}"
+Important = "{{colors.secondary.default.hex}}"
+Guidance = "{{colors.secondary.default.hex}}"
+Muted = "{{colors.on_surface_variant.default.hex}}"
+Annotation = "{{colors.on_surface_variant.default.hex}}"
+AlertInfo = "{{colors.tertiary.default.hex}}"
+AlertWarn = "{{colors.primary.default.hex}}"
+AlertError = "{{colors.error.default.hex}}"

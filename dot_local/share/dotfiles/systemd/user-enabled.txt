@@ -1,6 +1,4 @@
 gnome-keyring-daemon.socket
-noctalia-theme-sync-start.service
-noctalia-theme-sync.path
 openrgb-server.service
 p11-kit-server.socket
 pipewire-pulse.socket

@@ -412,16 +412,16 @@
         "telemetryEnabled": true
     },
     "hooks": {
-        "colorGeneration": "",
-        "darkModeChange": "bash ~/.config/noctalia/scripts/theme-sync.sh --dark-mode $1 --source dark-mode-change",
+        "colorGeneration": "~/.config/noctalia/scripts/apply-openrgb-theme.py",
+        "darkModeChange": "",
         "enabled": true,
         "performanceModeDisabled": "",
         "performanceModeEnabled": "",
         "screenLock": "",
-        "screenUnlock": "~/.config/noctalia/scripts/apply-openrgb-theme.py >/dev/null 2>&1 || true",
+        "screenUnlock": "~/.config/noctalia/scripts/apply-openrgb-theme.py",
         "session": "",
-        "startup": "bash ~/.config/noctalia/scripts/theme-sync.sh --source startup",
-        "wallpaperChange": "bash ~/.config/noctalia/scripts/theme-sync.sh --source wallpaper-change"
+        "startup": "",
+        "wallpaperChange": ""
     },
     "idle": {
         "customCommands": "[]",
@@ -648,7 +648,7 @@
                 "id": "code"
             }
         ],
-        "enableUserTheming": false
+        "enableUserTheming": true
     },
     "ui": {
         "boxBorderEnabled": false,

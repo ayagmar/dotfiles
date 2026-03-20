@@ -1,0 +1,9 @@
+[config]
+
+[templates.pi]
+input_path = "~/.config/noctalia/templates/pi-theme.json"
+output_path = "~/.pi/agent/themes/noctalia.json"
+
+[templates.atuin]
+input_path = "~/.config/noctalia/templates/atuin-theme.toml"
+output_path = "~/.config/atuin/themes/noctalia.toml"

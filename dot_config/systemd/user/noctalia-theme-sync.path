@@ -1,8 +1,0 @@
-[Unit]
-Description=Watch Noctalia colors and run theme sync
-
-[Path]
-PathChanged=%h/.config/noctalia/colors.json
-
-[Install]
-WantedBy=default.target

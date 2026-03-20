@@ -6,10 +6,10 @@ This directory contains the local `niri` layer for the desktop session.
 
 - [`config.kdl`](/home/ayagmar/.config/niri/config.kdl): compositor config, keybinds, startup, window rules
 - [`scripts/noctaliactl`](/home/ayagmar/.config/niri/scripts/noctaliactl): small Noctalia start/restart helper; regular shell actions use direct `qs -c noctalia-shell ipc call ...` binds
-- [`../noctalia/scripts/theme-sync.sh`](/home/ayagmar/.config/noctalia/scripts/theme-sync.sh): single theme sync entrypoint
-- [`../noctalia/scripts/apply-niri-theme.sh`](/home/ayagmar/.config/noctalia/scripts/apply-niri-theme.sh): writes `niri`/Kitty theme outputs
+- [`../noctalia/settings.json`](/home/ayagmar/.config/noctalia/settings.json): Noctalia hooks and built-in template selection
+- [`../noctalia/user-templates.toml`](/home/ayagmar/.config/noctalia/user-templates.toml): local Noctalia user-template manifest
+- [`../noctalia/templates/`](/home/ayagmar/.config/noctalia/templates): local templates for apps Noctalia does not ship built-ins for
 - [`../noctalia/scripts/apply-openrgb-theme.py`](/home/ayagmar/.config/noctalia/scripts/apply-openrgb-theme.py): applies RGB theme through the OpenRGB SDK via Python
-- [`../systemd/user/noctalia-theme-sync.path`](/home/ayagmar/.config/systemd/user/noctalia-theme-sync.path): watches theme color changes
 - [`../systemd/user/openrgb-server.service`](/home/ayagmar/.config/systemd/user/openrgb-server.service): keeps the OpenRGB SDK server tied to the niri session
 
 ## Startup Flow
@@ -22,19 +22,15 @@ Other startup ownership stays upstream-owned:
 
 - the polkit agent comes from the packaged desktop autostart/service
 - the OpenRGB SDK server comes from a user systemd service bound to `niri.service`
-- the initial theme sync comes from Noctalia's built-in `startup` hook
+- Noctalia renders themes through its built-in template pipeline
 
-## Theme Sync Flow
+## Theme Flow
 
-One entrypoint owns theme sync:
+Noctalia owns theme rendering:
 
-- [`theme-sync.sh`](/home/ayagmar/.config/noctalia/scripts/theme-sync.sh)
-
-It is used by:
-
-- Noctalia hooks in `settings.json`
-- the theme color watcher path unit
-- the built-in Noctalia startup hook
+- built-in Noctalia templates render `niri`, `kitty`, `gtk`, `qt`, `btop`, `code`, and `discord`
+- local Noctalia user templates render Pi and Atuin
+- Noctalia's built-in `colorGeneration` hook applies OpenRGB after colors/templates are ready
 
 ## Recovery
 
@@ -42,7 +38,7 @@ It is used by:
 
 ## Maintenance
 
-- Prefer updating `theme-sync.sh` for future theme-driven behavior
+- Prefer Noctalia templates and hooks over local watcher scripts
 - Keep session startup on upstream-owned paths where possible
 - Keep machine-specific logic isolated in small helper scripts
 - Prefer direct `qs -c noctalia-shell ipc call ...` binds for Noctalia actions, matching upstream docs
