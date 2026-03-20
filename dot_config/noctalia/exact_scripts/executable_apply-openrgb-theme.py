@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import fcntl
 import json
 import os
 import re
@@ -15,11 +16,24 @@ PORT = 6742
 CLIENT_NAME = "NoctaliaRGB"
 RETRY_COUNT = 6
 RETRY_DELAY_SECONDS = 1.0
+LOCK_NAME = "noctalia-openrgb.lock"
 
 
 def config_path(*parts: str) -> str:
     base = os.environ.get("XDG_CONFIG_HOME", os.path.join(os.environ["HOME"], ".config"))
     return os.path.join(base, *parts)
+
+
+def lock_path() -> str:
+    base = os.environ.get("XDG_RUNTIME_DIR") or config_path("noctalia")
+    os.makedirs(base, exist_ok=True)
+    return os.path.join(base, LOCK_NAME)
+
+
+def acquire_lock() -> int:
+    fd = os.open(lock_path(), os.O_CREAT | os.O_RDWR, 0o600)
+    fcntl.flock(fd, fcntl.LOCK_EX)
+    return fd
 
 
 def read_json(path: str) -> dict:
@@ -44,6 +58,7 @@ def start_server() -> None:
 
 def connect_client() -> OpenRGBClient:
     last_error = None
+
     for attempt in range(RETRY_COUNT):
         try:
             return OpenRGBClient(HOST, PORT, CLIENT_NAME)
@@ -51,7 +66,8 @@ def connect_client() -> OpenRGBClient:
             last_error = exc
             if attempt == 0:
                 start_server()
-            time.sleep(RETRY_DELAY_SECONDS)
+            if attempt < RETRY_COUNT - 1:
+                time.sleep(RETRY_DELAY_SECONDS)
 
     raise RuntimeError(f"failed to connect to OpenRGB SDK at {HOST}:{PORT}") from last_error
 
@@ -65,7 +81,7 @@ def find_first_by_type(client: OpenRGBClient, device_type: DeviceType, pattern: 
     for device in devices:
         if regex.search(device.name):
             return device
-    return devices[0] if devices else None
+    return None
 
 
 def find_first_by_name(client: OpenRGBClient, pattern: str):
@@ -88,68 +104,32 @@ def set_mode(device, *modes: str) -> bool:
 
 
 def apply_keyboard(device, color: RGBColor) -> None:
-    set_mode(device, "Direct")
+    if not set_mode(device, "Direct"):
+        return
     device.set_color(color)
     time.sleep(0.15)
 
 
 def apply_motherboard(device, color: RGBColor) -> None:
-    set_mode(device, "Direct", "Static")
+    if not set_mode(device, "Direct", "Static"):
+        return
 
-    try:
+    zones = getattr(device, "zones", [])
+    if not zones:
         device.set_color(color)
         time.sleep(0.15)
-    except Exception:  # noqa: BLE001
-        pass
+        return
 
-    for zone in getattr(device, "zones", []):
-        try:
-            if len(getattr(zone, "leds", [])) == 0:
-                zone.resize(1)
-                time.sleep(0.15)
-            zone.set_color(color)
-            time.sleep(0.1)
-        except Exception:  # noqa: BLE001
-            continue
+    for zone in zones:
+        zone.set_color(color)
+        time.sleep(0.1)
 
 
 def apply_gpu(device, color: RGBColor) -> None:
-    set_mode(device, "Direct", "Static")
+    if not set_mode(device, "Direct", "Static"):
+        return
     device.set_color(color)
     time.sleep(0.15)
-
-
-def apply_with_client(device_type: DeviceType, pattern: str, apply_fn, color: RGBColor) -> None:
-    client = connect_client()
-    try:
-        device = find_first_by_type(client, device_type, pattern)
-        if device is not None:
-            apply_fn(device, color)
-            time.sleep(0.2)
-    finally:
-        client.disconnect()
-
-
-def apply_gpu_with_retry(color: RGBColor) -> None:
-    last_error = None
-    for _ in range(2):
-        client = connect_client()
-        try:
-            gpu = find_first_by_type(client, DeviceType.GPU, r"5090|waterforce|gigabyte")
-            if gpu is None:
-                gpu = find_first_by_name(client, r"5090|waterforce|gigabyte")
-            if gpu is None:
-                return
-            apply_gpu(gpu, color)
-            time.sleep(0.2)
-            return
-        except Exception as exc:  # noqa: BLE001
-            last_error = exc
-            time.sleep(0.3)
-        finally:
-            client.disconnect()
-
-    raise RuntimeError("failed to apply GPU color via OpenRGB SDK") from last_error
 
 
 def main() -> int:
@@ -157,10 +137,28 @@ def main() -> int:
     if not os.path.exists(colors_file):
         return 0
 
-    color = read_accent_color()
-    apply_with_client(DeviceType.KEYBOARD, r"apex pro", apply_keyboard, color)
-    apply_with_client(DeviceType.MOTHERBOARD, r"msi mystic light|x870|msi", apply_motherboard, color)
-    apply_gpu_with_retry(color)
+    lock_fd = acquire_lock()
+    try:
+        color = read_accent_color()
+        client = connect_client()
+        try:
+            keyboard = find_first_by_type(client, DeviceType.KEYBOARD, r"apex pro")
+            if keyboard is not None:
+                apply_keyboard(keyboard, color)
+
+            motherboard = find_first_by_type(client, DeviceType.MOTHERBOARD, r"msi mystic light|x870|msi")
+            if motherboard is not None:
+                apply_motherboard(motherboard, color)
+
+            gpu = find_first_by_type(client, DeviceType.GPU, r"5090|waterforce|gigabyte")
+            if gpu is None:
+                gpu = find_first_by_name(client, r"5090|waterforce|gigabyte")
+            if gpu is not None:
+                apply_gpu(gpu, color)
+        finally:
+            client.disconnect()
+    finally:
+        os.close(lock_fd)
 
     return 0
 

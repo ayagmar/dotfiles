@@ -418,7 +418,7 @@
         "performanceModeDisabled": "",
         "performanceModeEnabled": "",
         "screenLock": "",
-        "screenUnlock": "~/.config/noctalia/scripts/apply-openrgb-theme.py",
+        "screenUnlock": "",
         "session": "",
         "startup": "",
         "wallpaperChange": ""
