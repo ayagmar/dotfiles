@@ -7,3 +7,11 @@ output_path = "~/.pi/agent/themes/noctalia.json"
 [templates.atuin]
 input_path = "~/.config/noctalia/templates/atuin-theme.toml"
 output_path = "~/.config/atuin/themes/noctalia.toml"
+
+[templates.macchina_config]
+input_path = "~/.config/noctalia/templates/macchina-config.toml"
+output_path = "~/.config/macchina/macchina.toml"
+
+[templates.macchina_theme]
+input_path = "~/.config/noctalia/templates/macchina-theme.toml"
+output_path = "~/.config/macchina/themes/Noctalia.toml"
