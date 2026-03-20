@@ -9,7 +9,9 @@ openssh
 git
 github-cli
 chezmoi
+gitleaks
 jq
+pre-commit
 uv
 nodejs
 mise

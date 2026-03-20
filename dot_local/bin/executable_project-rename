@@ -1,0 +1,601 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+fix_only=0
+dry_run=0
+pi_only=0
+codex_only=0
+pi_agent_dir="${HOME}/.pi/agent"
+codex_home="${HOME}/.codex"
+have_sqlite3=0
+sqlite3_warning_emitted=0
+
+warnings=()
+project_moved=0
+project_move_planned=0
+pi_dirs_moved=0
+pi_files_updated=0
+codex_jsonl_updated=0
+codex_db_rows_updated=0
+
+usage() {
+  cat <<'EOF'
+Usage: project-rename [options] <old_path> <new_path>
+
+Rename a project directory and repair Pi/Codex session metadata for that path.
+
+The rename is subtree-aware: if you rename `/a/Old` to `/a/old`, session metadata for
+nested projects like `/a/Old/app` is repaired too.
+
+Options:
+  --fix-only               Do not move the project directory; only repair Pi/Codex state
+  --dry-run                Print planned changes without modifying anything
+  --pi-only                Only repair Pi session state
+  --codex-only             Only repair Codex session state
+  --pi-agent-dir <path>    Override Pi agent dir (default: ~/.pi/agent)
+  --codex-home <path>      Override Codex home (default: ~/.codex)
+  -h, --help               Show this help
+EOF
+}
+
+require_cmd() {
+  if ! command -v "$1" >/dev/null 2>&1; then
+    printf 'Missing required command: %s\n' "$1" >&2
+    exit 1
+  fi
+}
+
+require_option_arg() {
+  local option="$1"
+  local value="${2-}"
+
+  if [[ -z "$value" ]]; then
+    printf 'Missing value for %s\n' "$option" >&2
+    exit 1
+  fi
+
+  if [[ "$value" == -* ]]; then
+    printf 'Invalid value for %s: %s\n' "$option" "$value" >&2
+    printf 'Use -- before the path if it begins with -\n' >&2
+    exit 1
+  fi
+}
+
+normalize_path() {
+  realpath -m "$1"
+}
+
+encode_pi_session_dir() {
+  local cwd="$1"
+  local trimmed="${cwd#/}"
+  trimmed="${trimmed//\//-}"
+  trimmed="${trimmed//\\/-}"
+  trimmed="${trimmed//:/-}"
+  printf -- '--%s--\n' "$trimmed"
+}
+
+sql_escape() {
+  printf '%s' "$1" | sed "s/'/''/g"
+}
+
+add_warning() {
+  warnings+=("$1")
+}
+
+warn_missing_sqlite3_once() {
+  if (( sqlite3_warning_emitted )); then
+    return
+  fi
+
+  sqlite3_warning_emitted=1
+  add_warning 'sqlite3 is unavailable; Codex JSONL metadata was scanned and updated, but Codex state DB rows were skipped.'
+}
+
+path_matches_prefix() {
+  local path="$1"
+  local prefix="$2"
+  [[ "$path" == "$prefix" || "$path" == "$prefix"/* ]]
+}
+
+rewrite_prefix() {
+  local path="$1"
+  local old_prefix="$2"
+  local new_prefix="$3"
+
+  if [[ "$path" == "$old_prefix" ]]; then
+    printf '%s\n' "$new_prefix"
+    return
+  fi
+
+  if [[ "$path" == "$old_prefix"/* ]]; then
+    printf '%s%s\n' "$new_prefix" "${path#$old_prefix}"
+    return
+  fi
+
+  printf '%s\n' "$path"
+}
+
+move_project() {
+  local old_path="$1"
+  local new_path="$2"
+
+  if [[ ! -e "$old_path" ]]; then
+    printf 'Old project path does not exist: %s\n' "$old_path" >&2
+    exit 1
+  fi
+
+  if [[ -e "$new_path" ]]; then
+    printf 'New project path already exists: %s\n' "$new_path" >&2
+    exit 1
+  fi
+
+  if (( dry_run )); then
+    printf '[dry-run] mv %s -> %s\n' "$old_path" "$new_path"
+    project_move_planned=1
+    return
+  fi
+
+  mkdir -p "$(dirname "$new_path")"
+  mv "$old_path" "$new_path"
+  printf 'Moved project: %s -> %s\n' "$old_path" "$new_path"
+  project_moved=1
+}
+
+patch_jsonl_file() {
+  local file_path="$1"
+  local jq_filter="$2"
+  shift 2
+
+  local tmp_file changed line updated
+  changed=0
+  tmp_file="$(mktemp)"
+
+  while IFS= read -r line || [[ -n "$line" ]]; do
+    updated="$(printf '%s\n' "$line" | jq -c "$jq_filter" "$@")"
+    if [[ "$updated" != "$line" ]]; then
+      changed=1
+    fi
+    printf '%s\n' "$updated" >> "$tmp_file"
+  done < "$file_path"
+
+  if (( !changed )); then
+    rm -f "$tmp_file"
+    return 1
+  fi
+
+  if (( dry_run )); then
+    rm -f "$tmp_file"
+    return 0
+  fi
+
+  mv "$tmp_file" "$file_path"
+  return 0
+}
+
+build_session_map_json() {
+  local -n dir_map_ref="$1"
+  local json='{}'
+  local old_dir
+
+  for old_dir in "${!dir_map_ref[@]}"; do
+    json="$(jq -cn --argjson obj "$json" --arg k "$old_dir" --arg v "${dir_map_ref[$old_dir]}" '$obj + {($k): $v}')"
+  done
+
+  printf '%s\n' "$json"
+}
+
+move_pi_session_dir() {
+  local old_dir="$1"
+  local new_dir="$2"
+  local item target moved
+  moved=0
+
+  if [[ "$old_dir" == "$new_dir" ]]; then
+    return
+  fi
+
+  if [[ ! -d "$old_dir" ]]; then
+    if [[ -d "$new_dir" ]]; then
+      return
+    fi
+
+    add_warning "Skipping missing Pi session dir: ${old_dir}"
+    return
+  fi
+
+  if (( dry_run )); then
+    if [[ -d "$new_dir" ]]; then
+      printf '[dry-run] merge Pi session dir %s -> %s\n' "$old_dir" "$new_dir"
+    else
+      printf '[dry-run] mv %s -> %s\n' "$old_dir" "$new_dir"
+    fi
+    pi_dirs_moved=$((pi_dirs_moved + 1))
+    return
+  fi
+
+  if [[ -d "$new_dir" ]]; then
+    mkdir -p "$new_dir"
+    shopt -s nullglob dotglob
+    for item in "$old_dir"/*; do
+      target="$new_dir/$(basename "$item")"
+      if [[ -e "$target" ]]; then
+        printf 'Cannot merge Pi session dir; target already exists: %s\n' "$target" >&2
+        exit 1
+      fi
+      mv "$item" "$target"
+      moved=$((moved + 1))
+    done
+    shopt -u nullglob dotglob
+    rmdir "$old_dir"
+    printf 'Merged Pi session dir: %s -> %s (%s files)\n' "$old_dir" "$new_dir" "$moved"
+  else
+    mkdir -p "$(dirname "$new_dir")"
+    mv "$old_dir" "$new_dir"
+    printf 'Moved Pi session dir: %s -> %s\n' "$old_dir" "$new_dir"
+  fi
+
+  pi_dirs_moved=$((pi_dirs_moved + 1))
+}
+
+cleanup_empty_pi_dir() {
+  local old_cwd="$1"
+  local sessions_root="$pi_agent_dir/sessions"
+  local dir
+
+  if [[ ! -d "$sessions_root" ]]; then
+    return 0
+  fi
+
+  dir="$sessions_root/$(encode_pi_session_dir "$old_cwd")"
+  if [[ ! -d "$dir" ]]; then
+    return 0
+  fi
+
+  if find "$dir" -mindepth 1 -print -quit | grep -q .; then
+    return
+  fi
+
+  if (( dry_run )); then
+    printf '[dry-run] remove empty Pi session dir: %s\n' "$dir"
+    return
+  fi
+
+  rmdir "$dir"
+  printf 'Removed empty Pi session dir: %s\n' "$dir"
+}
+
+repair_pi_sessions() {
+  local old_cwd="$1"
+  local new_cwd="$2"
+  local sessions_root="$pi_agent_dir/sessions"
+  local dir session_file header_cwd updated_cwd session_map_json
+  local -A dir_map=()
+  local -A target_dirs=()
+
+  if [[ ! -d "$sessions_root" ]]; then
+    return 0
+  fi
+
+  shopt -s nullglob
+  for dir in "$sessions_root"/*; do
+    [[ -d "$dir" ]] || continue
+
+    session_file=''
+    for session_file in "$dir"/*.jsonl; do
+      [[ -f "$session_file" ]] && break
+    done
+    [[ -n "$session_file" && -f "$session_file" ]] || continue
+
+    header_cwd="$(head -n 1 "$session_file" | jq -r 'select(.type == "session") | .cwd // empty' 2>/dev/null || true)"
+    [[ -n "$header_cwd" ]] || continue
+
+    if ! path_matches_prefix "$header_cwd" "$old_cwd"; then
+      continue
+    fi
+
+    updated_cwd="$(rewrite_prefix "$header_cwd" "$old_cwd" "$new_cwd")"
+    dir_map["$dir"]="$sessions_root/$(encode_pi_session_dir "$updated_cwd")"
+  done
+  shopt -u nullglob
+
+  if ((${#dir_map[@]} == 0)); then
+    cleanup_empty_pi_dir "$old_cwd"
+    return
+  fi
+
+  for dir in "${!dir_map[@]}"; do
+    move_pi_session_dir "$dir" "${dir_map[$dir]}"
+    target_dirs["${dir_map[$dir]}"]=1
+  done
+
+  session_map_json="$(build_session_map_json dir_map)"
+
+  for dir in "${!target_dirs[@]}"; do
+    shopt -s nullglob
+    for session_file in "$dir"/*.jsonl; do
+      if patch_jsonl_file \
+        "$session_file" \
+        'def rename_prefix($from; $to):
+           if . == $from then $to
+           elif startswith($from + "/") then $to + .[($from | length):]
+           else .
+           end;
+         def rewrite_session_path($map):
+           if type != "string" then .
+           else reduce ($map | to_entries[]) as $entry (.;
+             if . == $entry.key then $entry.value
+             elif startswith($entry.key + "/") then $entry.value + .[($entry.key | length):]
+             else .
+             end)
+           end;
+         if .type == "session" then
+           (.cwd |= rename_prefix($old_cwd; $new_cwd))
+           | (.parentSession |= rewrite_session_path($session_map))
+         else
+           .
+         end' \
+        --arg old_cwd "$old_cwd" \
+        --arg new_cwd "$new_cwd" \
+        --argjson session_map "$session_map_json"
+      then
+        if (( dry_run )); then
+          printf '[dry-run] update Pi session metadata: %s\n' "$session_file"
+        fi
+        pi_files_updated=$((pi_files_updated + 1))
+      fi
+    done
+    shopt -u nullglob
+  done
+
+  cleanup_empty_pi_dir "$old_cwd"
+}
+
+get_codex_rollout_paths() {
+  local state_db="$1"
+  local old_cwd="$2"
+  local escaped_old
+
+  if (( !have_sqlite3 )); then
+    return
+  fi
+
+  escaped_old="$(sql_escape "$old_cwd")"
+
+  sqlite3 "file:${state_db}?mode=ro" \
+    "SELECT rollout_path FROM threads WHERE cwd = '${escaped_old}' OR cwd LIKE '${escaped_old}/%';" 2>/dev/null || true
+}
+
+fallback_codex_rollout_scan() {
+  local sessions_root="$1"
+  local old_cwd="$2"
+
+  if [[ ! -d "$sessions_root" ]]; then
+    return 0
+  fi
+
+  grep -RFl --include='*.jsonl' "\"cwd\":\"${old_cwd}" "$sessions_root" 2>/dev/null || true
+}
+
+patch_codex_rollout() {
+  local rollout_path="$1"
+  local old_cwd="$2"
+  local new_cwd="$3"
+
+  patch_jsonl_file \
+    "$rollout_path" \
+    'def rename_prefix($from; $to):
+       if . == $from then $to
+       elif startswith($from + "/") then $to + .[($from | length):]
+       else .
+       end;
+     if ((.type == "session_meta") or (.type == "turn_context")) and (.payload | type == "object") and ((.payload.cwd == $old_cwd) or (.payload.cwd | startswith($old_cwd + "/")))
+       then .payload.cwd |= rename_prefix($old_cwd; $new_cwd)
+       else .
+       end' \
+    --arg old_cwd "$old_cwd" \
+    --arg new_cwd "$new_cwd"
+}
+
+update_codex_threads_db() {
+  local state_db="$1"
+  local old_cwd="$2"
+  local new_cwd="$3"
+  local escaped_old escaped_new changes where_clause
+
+  if (( !have_sqlite3 )); then
+    [[ -f "$state_db" ]] && warn_missing_sqlite3_once
+    return
+  fi
+
+  escaped_old="$(sql_escape "$old_cwd")"
+  escaped_new="$(sql_escape "$new_cwd")"
+  where_clause="cwd = '${escaped_old}' OR cwd LIKE '${escaped_old}/%'"
+
+  if (( dry_run )); then
+    changes="$(sqlite3 "file:${state_db}?mode=ro" "SELECT COUNT(*) FROM threads WHERE ${where_clause};" 2>/dev/null || true)"
+    if [[ -n "$changes" && "$changes" != "0" ]]; then
+      printf '[dry-run] update Codex state DB rows: %s\n' "$changes"
+      codex_db_rows_updated=$((codex_db_rows_updated + changes))
+    fi
+    return
+  fi
+
+  if ! changes="$(sqlite3 "$state_db" <<SQL 2>/dev/null | tail -n 1
+PRAGMA busy_timeout=5000;
+UPDATE threads
+SET cwd = CASE
+  WHEN cwd = '${escaped_old}' THEN '${escaped_new}'
+  ELSE '${escaped_new}' || substr(cwd, length('${escaped_old}') + 1)
+END
+WHERE ${where_clause};
+SELECT changes();
+SQL
+)"; then
+    add_warning "Could not update Codex state DB (${state_db}). Close Codex and rerun --fix-only if you want cwd filtering repaired there too."
+    return
+  fi
+
+  if [[ -n "$changes" ]]; then
+    codex_db_rows_updated=$((codex_db_rows_updated + changes))
+  fi
+}
+
+repair_codex_sessions() {
+  local old_cwd="$1"
+  local new_cwd="$2"
+  local sessions_root="$codex_home/sessions"
+  local state_db rollout_path line
+  local -a rollout_paths=()
+
+  shopt -s nullglob
+  for state_db in "$codex_home"/state_*.sqlite; do
+    while IFS= read -r line; do
+      [[ -n "$line" ]] || continue
+      rollout_paths+=("$line")
+    done < <(get_codex_rollout_paths "$state_db" "$old_cwd")
+  done
+  shopt -u nullglob
+
+  while IFS= read -r line; do
+    [[ -n "$line" ]] || continue
+    rollout_paths+=("$line")
+  done < <(fallback_codex_rollout_scan "$sessions_root" "$old_cwd")
+
+  if ((${#rollout_paths[@]} > 0)); then
+    mapfile -t rollout_paths < <(printf '%s\n' "${rollout_paths[@]}" | awk '!seen[$0]++')
+  fi
+
+  for rollout_path in "${rollout_paths[@]}"; do
+    [[ -f "$rollout_path" ]] || continue
+    if patch_codex_rollout "$rollout_path" "$old_cwd" "$new_cwd"; then
+      if (( dry_run )); then
+        printf '[dry-run] update Codex rollout metadata: %s\n' "$rollout_path"
+      fi
+      codex_jsonl_updated=$((codex_jsonl_updated + 1))
+    fi
+  done
+
+  shopt -s nullglob
+  for state_db in "$codex_home"/state_*.sqlite; do
+    update_codex_threads_db "$state_db" "$old_cwd" "$new_cwd"
+  done
+  shopt -u nullglob
+}
+
+while (($# > 0)); do
+  case "$1" in
+    --fix-only)
+      fix_only=1
+      shift
+      ;;
+    --dry-run)
+      dry_run=1
+      shift
+      ;;
+    --pi-only)
+      pi_only=1
+      shift
+      ;;
+    --codex-only)
+      codex_only=1
+      shift
+      ;;
+    --pi-agent-dir)
+      require_option_arg "$1" "${2-}"
+      pi_agent_dir="$2"
+      shift 2
+      ;;
+    --codex-home)
+      require_option_arg "$1" "${2-}"
+      codex_home="$2"
+      shift 2
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    --)
+      shift
+      break
+      ;;
+    -*)
+      printf 'Unknown option: %s\n' "$1" >&2
+      usage >&2
+      exit 1
+      ;;
+    *)
+      break
+      ;;
+  esac
+done
+
+if (( pi_only && codex_only )); then
+  printf '%s\n' '--pi-only and --codex-only cannot be combined' >&2
+  exit 1
+fi
+
+if (($# != 2)); then
+  usage >&2
+  exit 1
+fi
+
+require_cmd realpath
+require_cmd jq
+
+if command -v sqlite3 >/dev/null 2>&1; then
+  have_sqlite3=1
+fi
+
+old_cwd="$(normalize_path "$1")"
+new_cwd="$(normalize_path "$2")"
+pi_agent_dir="$(normalize_path "$pi_agent_dir")"
+codex_home="$(normalize_path "$codex_home")"
+
+if [[ "$old_cwd" == "$new_cwd" ]]; then
+  printf 'Old path and new path are identical after normalization\n' >&2
+  exit 1
+fi
+
+run_pi=1
+run_codex=1
+if (( codex_only )); then
+  run_pi=0
+fi
+if (( pi_only )); then
+  run_codex=0
+fi
+
+if (( !fix_only )); then
+  move_project "$old_cwd" "$new_cwd"
+fi
+
+if (( run_pi )); then
+  repair_pi_sessions "$old_cwd" "$new_cwd"
+fi
+
+if (( run_codex )); then
+  repair_codex_sessions "$old_cwd" "$new_cwd"
+fi
+
+if (( dry_run )); then
+  printf 'Summary (dry-run):\n'
+  printf '  project move planned: %s\n' "$([[ $project_move_planned -eq 1 ]] && printf yes || printf no)"
+  printf '  pi session dirs to move: %s\n' "$pi_dirs_moved"
+  printf '  pi session files to update: %s\n' "$pi_files_updated"
+  printf '  codex rollout files to update: %s\n' "$codex_jsonl_updated"
+  printf '  codex DB rows to update: %s\n' "$codex_db_rows_updated"
+else
+  printf 'Summary:\n'
+  printf '  project moved: %s\n' "$([[ $project_moved -eq 1 ]] && printf yes || printf no)"
+  printf '  pi session dirs moved: %s\n' "$pi_dirs_moved"
+  printf '  pi session files updated: %s\n' "$pi_files_updated"
+  printf '  codex rollout files updated: %s\n' "$codex_jsonl_updated"
+  printf '  codex DB rows updated: %s\n' "$codex_db_rows_updated"
+fi
+
+if ((${#warnings[@]} > 0)); then
+  for warning in "${warnings[@]}"; do
+    printf 'Warning: %s\n' "$warning" >&2
+  done
+fi
