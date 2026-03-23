@@ -17,6 +17,11 @@ CLIENT_NAME = "NoctaliaRGB"
 RETRY_COUNT = 6
 RETRY_DELAY_SECONDS = 1.0
 LOCK_NAME = "noctalia-openrgb.lock"
+ADDRESSABLE_MOTHERBOARD_ZONES = {
+    "JARGB 1": 20,  # case strip / cage lighting
+    "JARGB 2": 20,  # 3 bottom fans + rear fan
+    "JARGB 3": 20,  # top radiator fans
+}
 
 
 def config_path(*parts: str) -> str:
@@ -110,6 +115,19 @@ def apply_keyboard(device, color: RGBColor) -> None:
     time.sleep(0.15)
 
 
+def addressable_motherboard_zone_size(zone) -> int | None:
+    name = getattr(zone, "name", "")
+    return ADDRESSABLE_MOTHERBOARD_ZONES.get(name)
+
+
+def ensure_zone_size(zone, zone_size: int) -> None:
+    if len(getattr(zone, "leds", [])) == zone_size:
+        return
+
+    zone.resize(zone_size)
+    time.sleep(0.15)
+
+
 def apply_motherboard(device, color: RGBColor) -> None:
     if not set_mode(device, "Direct", "Static"):
         return
@@ -121,6 +139,11 @@ def apply_motherboard(device, color: RGBColor) -> None:
         return
 
     for zone in zones:
+        zone_size = addressable_motherboard_zone_size(zone)
+        if zone_size is None:
+            continue
+
+        ensure_zone_size(zone, zone_size)
         zone.set_color(color)
         time.sleep(0.1)
 

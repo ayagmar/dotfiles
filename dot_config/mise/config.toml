@@ -1,6 +1,11 @@
 [tools]
+android-sdk = "latest"
 bun = "latest"
 go = "latest"
+gradle = "8"
+java = "25.0.2"
+jbang = "latest"
+maven = "3"
 node = "latest"
 pnpm = "latest"
 uv = "latest"

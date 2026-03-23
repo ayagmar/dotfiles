@@ -18,3 +18,4 @@ image/png=swayimg.desktop
 image/svg+xml=swayimg.desktop
 image/tiff=swayimg.desktop
 image/webp=swayimg.desktop
+x-scheme-handler/jetbrains=jetbrainsd.desktop

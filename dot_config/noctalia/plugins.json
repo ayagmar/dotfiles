@@ -7,6 +7,10 @@
         }
     ],
     "states": {
+        "jetbrains-toolbox-provider": {
+            "enabled": true,
+            "sourceUrl": "https://github.com/noctalia-dev/noctalia-plugins"
+        },
         "obs-control": {
             "enabled": true,
             "sourceUrl": "https://github.com/noctalia-dev/noctalia-plugins"

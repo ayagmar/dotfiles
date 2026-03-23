@@ -56,4 +56,6 @@ Noctalia owns theme rendering:
 - Keep machine-specific logic isolated in small helper scripts
 - Prefer direct `qs -c noctalia-shell ipc call ...` binds for Noctalia actions, matching upstream docs
 - RGB sync currently covers the GPU, keyboard, and motherboard headers through the OpenRGB SDK helper
+- the motherboard helper uses an explicit MSI zone map instead of a blanket resize: `JARGB 1` = case strip / cage lighting, `JARGB 2` = 3 bottom fans + rear fan, `JARGB 3` = top radiator fans
+- those mapped motherboard zones are currently sized to practical per-zone values for solid-color syncing (`JARGB 1 = 20`, `JARGB 2 = 20`, `JARGB 3 = 20`); `JAF` is left alone because nothing visible is connected there
 - Corsair RAM is not part of the sync yet because OpenRGB is not exposing a DRAM controller on this machine

@@ -32,6 +32,7 @@
         ],
         "preferredPlayer": "",
         "spectrumFrameRate": 30,
+        "spectrumMirrored": true,
         "visualizerType": "linear",
         "volumeFeedback": false,
         "volumeFeedbackSoundFile": "",
@@ -49,7 +50,6 @@
         "density": "default",
         "displayMode": "always_visible",
         "enableExclusionZoneInset": true,
-        "floating": false,
         "fontScale": 1,
         "frameRadius": 12,
         "frameThickness": 8,
@@ -181,6 +181,27 @@
                     ]
                 },
                 {
+                    "defaultSettings": {
+                        "autoCloseManagedObs": true,
+                        "barLabelMode": "short-label",
+                        "launchBehavior": "minimized-to-tray",
+                        "leftClickAction": "panel",
+                        "openVideosAfterStop": true,
+                        "pollIntervalMs": 2500,
+                        "showBarWhenRecording": true,
+                        "showBarWhenReplay": false,
+                        "showBarWhenStreaming": true,
+                        "showControlCenterWhenReady": false,
+                        "showControlCenterWhenRecording": true,
+                        "showControlCenterWhenReplay": true,
+                        "showControlCenterWhenStreaming": true,
+                        "showElapsedInBar": false,
+                        "videosOpener": "xdg-open",
+                        "videosPath": ""
+                    },
+                    "id": "plugin:obs-control"
+                },
+                {
                     "hideWhenZero": false,
                     "hideWhenZeroUnread": false,
                     "iconColor": "none",
@@ -203,9 +224,6 @@
                     "icon": "noctalia",
                     "id": "ControlCenter",
                     "useDistroLogo": false
-                },
-                {
-                    "id": "plugin:obs-control"
                 }
             ]
         }
@@ -239,7 +257,7 @@
         "manualSunrise": "06:30",
         "manualSunset": "18:30",
         "monitorForColors": "",
-        "predefinedScheme": "Ayu",
+        "predefinedScheme": "Noctalia (default)",
         "schedulingMode": "off",
         "useWallpaperColors": false
     },
@@ -321,7 +339,7 @@
         "deadOpacity": 0.6,
         "displayMode": "auto_hide",
         "dockType": "floating",
-        "enabled": true,
+        "enabled": false,
         "floatingRatio": 1,
         "groupApps": false,
         "groupClickAction": "cycle",
@@ -460,8 +478,7 @@
         "bluetoothRssiPollingEnabled": false,
         "disableDiscoverability": false,
         "networkPanelView": "wifi",
-        "wifiDetailsViewMode": "grid",
-        "wifiEnabled": true
+        "wifiDetailsViewMode": "grid"
     },
     "nightLight": {
         "autoSchedule": true,
@@ -513,9 +530,9 @@
         "backgroundOpacity": 1,
         "enabled": true,
         "enabledTypes": [
-            0,
             1,
-            2
+            2,
+            0
         ],
         "location": "top_right",
         "monitors": [
@@ -646,6 +663,10 @@
             {
                 "enabled": true,
                 "id": "code"
+            },
+            {
+                "enabled": true,
+                "id": "yazi"
             }
         ],
         "enableUserTheming": true
@@ -675,6 +696,11 @@
         "fillMode": "crop",
         "hideWallpaperFilenames": false,
         "monitorDirectories": [
+            {
+                "directory": "/home/ayagmar/Pictures/Wallpapers",
+                "name": "DP-1",
+                "wallpaper": ""
+            }
         ],
         "overviewBlur": 0.4,
         "overviewEnabled": false,
@@ -696,6 +722,7 @@
             "pixelate",
             "honeycomb"
         ],
+        "useOriginalImages": false,
         "useSolidColor": false,
         "useWallhaven": false,
         "viewMode": "single",
