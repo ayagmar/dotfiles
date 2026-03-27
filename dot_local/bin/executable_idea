@@ -1,0 +1,23 @@
+#!/usr/bin/env zsh
+
+launcher="$HOME/.local/share/JetBrains/Toolbox/scripts/idea"
+
+if [[ ! -x "$launcher" ]]; then
+  print -u2 "idea launcher not found: $launcher"
+  exit 1
+fi
+
+for arg in "$@"; do
+  case "$arg" in
+    --help|-h|--version|--wait)
+      exec "$launcher" "$@"
+      ;;
+  esac
+done
+
+if command -v setsid >/dev/null 2>&1; then
+  exec setsid -f "$launcher" "$@" >/dev/null 2>&1
+fi
+
+nohup "$launcher" "$@" >/dev/null 2>&1 &
+disown

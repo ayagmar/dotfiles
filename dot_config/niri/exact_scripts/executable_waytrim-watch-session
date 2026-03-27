@@ -1,0 +1,11 @@
+#!/bin/sh
+set -eu
+
+systemctl_bin="${SYSTEMCTL_BIN:-systemctl}"
+unit="${1:-${WAYTRIM_WATCH_UNIT:-waytrim-watch@auto.service}}"
+
+"$systemctl_bin" --user import-environment WAYLAND_DISPLAY XDG_RUNTIME_DIR
+
+if "$systemctl_bin" --user is-enabled --quiet "$unit"; then
+    "$systemctl_bin" --user restart "$unit"
+fi

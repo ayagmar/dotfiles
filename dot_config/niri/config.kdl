@@ -56,7 +56,7 @@ output "DP-1" {
 // https://yalter.github.io/niri/Configuration:-Layout
 layout {
     // Set gaps around windows in logical pixels.
-    gaps 6
+    gaps 10
 
     // Let Noctalia's wallpaper layer show through the workspace background.
     background-color "transparent"
@@ -138,6 +138,9 @@ layout {
 
 // Start Noctalia the way its upstream docs recommend for Niri.
 spawn-at-startup "qs" "-c" "noctalia-shell" "--no-duplicate"
+// Import Wayland session variables for user services, then restart the enabled
+// waytrim watcher unit inside the real Niri session.
+spawn-at-startup "sh" "-lc" "\"$HOME/.config/niri/scripts/waytrim-watch-session\""
 // To run a shell command (with variables, pipes, etc.), use spawn-sh-at-startup:
 // spawn-sh-at-startup "qs -c ~/source/qs/MyAwesomeShell"
 
@@ -254,6 +257,11 @@ binds {
     Mod+E hotkey-overlay-title="Open Noctalia Emoji Picker" { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "launcher" "emoji"; }
     Mod+Alt+C hotkey-overlay-title="Open Noctalia Settings" { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "settings" "toggle"; }
     Mod+Alt+N hotkey-overlay-title="Restart Noctalia Shell" { spawn-sh "\"$HOME/.config/niri/scripts/noctaliactl\" restart-shell"; }
+    Mod+Alt+V hotkey-overlay-title="Repair Clipboard with Waytrim" { spawn "waytrim" "prose" "--clipboard"; }
+    Mod+Alt+R hotkey-overlay-title="Restore Original Clipboard Text" { spawn-sh "\"$HOME/.config/niri/scripts/waytrim-restore-clipboard\""; }
+    Mod+Alt+A hotkey-overlay-title="Set Waytrim Watcher to Auto" { spawn-sh "\"$HOME/.config/niri/scripts/waytrim-watch-mode\" auto"; }
+    Mod+Alt+P hotkey-overlay-title="Set Waytrim Watcher to Prose" { spawn-sh "\"$HOME/.config/niri/scripts/waytrim-watch-mode\" prose"; }
+    Mod+Alt+X hotkey-overlay-title="Stop Waytrim Watcher" { spawn-sh "\"$HOME/.config/niri/scripts/waytrim-watch-mode\" stop"; }
     Mod+Shift+W hotkey-overlay-title="Open Noctalia Wallpaper Selector" { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "wallpaper" "toggle"; }
     Mod+Ctrl+W hotkey-overlay-title="Toggle Wallpaper Automation" { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "wallpaper" "toggleAutomation"; }
     Mod+D hotkey-overlay-title="Toggle Noctalia Dark Mode" { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "darkMode" "toggle"; }

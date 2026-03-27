@@ -1,6 +1,6 @@
 [user]
-	name = ayagmar
-	email = 62888618+ayagmar@users.noreply.github.com
+	name = Abdeslam Yassine Agmar
+	email = abdeslamagmar@gmail.com
 	signingkey = /home/ayagmar/.ssh/id_github_ayagmar.pub
 [init]
 	defaultBranch = master

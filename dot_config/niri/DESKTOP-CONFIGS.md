@@ -18,6 +18,9 @@ This machine's desktop-related config is mostly XDG-clean.
   - Active Noctalia color scheme source.
 - `~/.config/noctalia/plugins.json`
   - Noctalia plugin enablement/config.
+- `~/.config/noctalia/plugins/`
+  - Plugin install tree managed by Noctalia's plugin workflow.
+  - Intentionally not tracked by chezmoi so local plugin checkouts and installs are not deleted.
 - `~/.config/kitty/kitty.conf`
   - Terminal config.
 - `~/.config/kitty/themes/noctalia.conf`

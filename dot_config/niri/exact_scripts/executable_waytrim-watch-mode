@@ -1,0 +1,28 @@
+#!/bin/sh
+set -eu
+
+systemctl_bin="${SYSTEMCTL_BIN:-systemctl}"
+mode="${1:-auto}"
+units="waytrim-watch@auto.service waytrim-watch@prose.service waytrim-watch@command.service"
+
+"$systemctl_bin" --user import-environment WAYLAND_DISPLAY XDG_RUNTIME_DIR
+
+case "$mode" in
+    auto|prose|command)
+        "$systemctl_bin" --user disable --now $units >/dev/null 2>&1 || true
+        "$systemctl_bin" --user enable --now "waytrim-watch@${mode}.service"
+        if command -v notify-send >/dev/null 2>&1; then
+            notify-send --app-name=waytrim "Waytrim watcher mode" "$mode"
+        fi
+        ;;
+    stop|off|disable)
+        "$systemctl_bin" --user disable --now $units >/dev/null 2>&1 || true
+        if command -v notify-send >/dev/null 2>&1; then
+            notify-send --app-name=waytrim "Waytrim watcher" "stopped"
+        fi
+        ;;
+    *)
+        echo "usage: waytrim-watch-mode <auto|prose|command|stop>" >&2
+        exit 1
+        ;;
+esac

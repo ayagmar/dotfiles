@@ -1,0 +1,16 @@
+#!/bin/sh
+set -eu
+
+if output="$(waytrim-watch --restore-original 2>&1)"; then
+    if command -v notify-send >/dev/null 2>&1; then
+        notify-send --app-name=waytrim "Waytrim restore" "$output"
+    fi
+    exit 0
+fi
+
+if command -v notify-send >/dev/null 2>&1; then
+    notify-send --app-name=waytrim --urgency=critical "Waytrim restore failed" "$output"
+fi
+
+printf '%s\n' "$output" >&2
+exit 1
