@@ -155,6 +155,36 @@ media = false
 [audio]
 enable_sounds = false
 
+# Explicit actions retain the native defaults and restore the Windows boot button.
+[[shell.session.actions]]
+action = "lock"
+shortcut = "1"
+
+[[shell.session.actions]]
+action = "logout"
+shortcut = "2"
+
+[[shell.session.actions]]
+action = "lock_and_suspend"
+shortcut = "3"
+
+[[shell.session.actions]]
+action = "reboot"
+shortcut = "4"
+
+[[shell.session.actions]]
+action = "shutdown"
+shortcut = "5"
+variant = "destructive"
+
+[[shell.session.actions]]
+action = "command"
+label = "Reboot to Windows"
+glyph = "brand-windows"
+shortcut = "7"
+countdown_seconds = 10
+command = "/usr/bin/pkexec /usr/bin/sh -c '/usr/bin/efibootmgr -n 0000 && exec /usr/bin/systemctl reboot'"
+
 [plugin_settings."cleboost/jetbrains-provider"]
 max_results = 50
 

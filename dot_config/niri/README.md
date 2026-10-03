@@ -99,11 +99,18 @@ bind replaces that old action. The native JetBrains provider is enabled with
 polkit and notifications use Noctalia's native services.
 
 The OBS port is pinned in `.chezmoiexternal.toml` while its upstream PR is reviewed.
+
 An onchange installation script creates its isolated Python environment using the
 plugin's pinned `requirements.txt`. For a port update, change the archive revision
 and the script revision together. Once accepted upstream, use Noctalia's plugin
 installer and remove the temporary archive override. Keep an interpreter with
 `websocket-client` installed in the plugin settings.
+
+The Session power menu also includes **Reboot to Windows**, with shortcut `7`
+while the menu is open and a ten-second countdown. It asks for administrator
+authentication, sets the one-time firmware boot target to Windows Boot Manager
+(`Boot0000` on this machine), then reboots. The normal reboot action stays native.
+The `efibootmgr` package is included in the baseline for this action.
 
 Validate with `noctalia config validate` and `niri validate`. Logs live in
 `~/.cache/noctalia/noctalia.log`. After migration, remove the old shell packages

@@ -35,6 +35,7 @@ seatd
 niri
 noctalia
 sound-theme-freedesktop
+efibootmgr
 kitty
 gnome-keyring
 seahorse
