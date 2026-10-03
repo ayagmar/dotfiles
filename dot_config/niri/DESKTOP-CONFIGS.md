@@ -1,87 +1,74 @@
 # Desktop Config Map
 
-This machine's desktop-related config is mostly XDG-clean.
+Chezmoi owns declarative configuration. Noctalia owns GUI overrides, runtime state
+and generated application palettes.
 
-## Main config files
+## Managed configuration
 
-- `~/.config/niri/config.kdl`
-  - Main Niri compositor config.
-- `~/.config/niri/noctalia.kdl`
-  - Generated Niri theme values rendered by Noctalia upstream.
-- `~/.config/noctalia/settings.json`
-  - Main Noctalia shell settings and hook/template selection.
-- `~/.config/noctalia/user-templates.toml`
-  - Local Noctalia user-template manifest.
-- `~/.config/noctalia/templates/`
-  - Local templates for apps Noctalia does not ship built-ins for.
-- `~/.config/noctalia/colors.json`
-  - Active Noctalia color scheme source.
-- `~/.config/noctalia/plugins.json`
-  - Noctalia plugin enablement/config.
-- `~/.config/noctalia/plugins/`
-  - Plugin install tree managed by Noctalia's plugin workflow.
-  - Intentionally not tracked by chezmoi so local plugin checkouts and installs are not deleted.
-- `~/.config/kitty/kitty.conf`
-  - Terminal config.
-- `~/.config/kitty/themes/noctalia.conf`
-  - Noctalia-rendered Kitty theme source.
-- `~/.config/vesktop/settings/settings.json`
-  - Vesktop client settings.
-- `~/.local/share/applications/vesktop.desktop`
-  - Local launcher override forcing native Wayland flags.
-- `/usr/share/wayland-sessions/niri.desktop`
-  - Packaged Niri session entry.
-  - Starts `niri-session`, which in turn activates `niri.service` and `graphical-session.target`.
+| Path | Purpose |
+| --- | --- |
+| `~/.config/niri/config.kdl` | Niri startup, bindings and window rules |
+| `~/.config/noctalia/config.toml` | Native v5 desktop, plugin and integration preferences |
+| `~/.config/noctalia/templates.toml` | Built-in, community and local theme templates |
+| `~/.config/noctalia/templates/` | Local palette template inputs |
+| `~/.config/noctalia/scripts/apply-openrgb-theme.py` | Serialized RGB accent synchronization |
+| `~/.config/kitty/kitty.conf` | Terminal preferences and generated-theme include |
+| `~/.config/gtk-{3,4}.0/settings.ini` | Icons and cursor preferences |
+| `~/.config/qt{5,6}ct/qt{5,6}ct.conf` | Qt application palette selection |
+| `~/.config/Code/User/settings.json` | Noctalia theme selection in VS Code |
+| `~/.config/vesktop/settings{,/settings}.json` | Vesktop and Vencord preferences |
+| `~/.config/spicetify/config-xpui.ini` | Spotify's palette-only Noctalia theme and Marketplace |
+| `~/.config/spicetify/Themes/Noctalia/user.css` | Minimal theme without layout overrides |
+| `~/.config/obs-studio/` | Stable profile, global and user settings; encrypted WebSocket config |
+| `~/.config/environment.d/` | Session environment |
+| `~/.config/xdg-desktop-portal/` | Niri portal choices |
+| `~/.config/systemd/user/` | OpenRGB SDK and other user services |
+| `~/.local/share/applications/` | Application-native launcher overrides |
 
-## Service state
+OBS scene collections contain machine-specific PipeWire restore tokens and remain
+untracked. Discord screenshot credentials stay encrypted or local-only.
 
-- `~/.config/systemd/user/niri.service.wants/openrgb-server.service`
-  - User-level enablement link for the OpenRGB SDK server.
-- `~/.config/systemd/user/graphical-session.target.wants/xwayland-satellite.service`
-  - User-level enablement link for Xwayland on Niri.
+## Native Noctalia state
 
-## Defaults shipped by packages
+- `~/.local/state/noctalia/settings.toml`: GUI overrides; preserve these when restoring.
+- `~/.local/state/noctalia/state.toml`: app-owned runtime state.
+- `~/.local/share/noctalia/plugins/`: native v5 Luau plugins. The OBS port is
+  temporarily installed from a pinned chezmoi external; Headroom links to the
+  separate development checkout at `~/projects/headroom`; JetBrains uses Noctalia.
+- `~/.local/share/noctalia/obs-control-python/`: reproducible Python environment,
+  recreated by the chezmoi onchange script.
+- `$XDG_RUNTIME_DIR/noctalia-obs-control/`: private per-session lock and ownership;
+  never restore this directory from another session.
+- `~/.cache/noctalia/noctalia.log`: current shell log.
 
-- `/etc/xdg/quickshell/noctalia-shell/`
-  - Noctalia upstream assets, defaults, and templates.
-  - Your editable user config is not here; it is in `~/.config/noctalia/`.
+Legacy `settings.json`, `plugins.json`, `user-templates.toml` and the QML plugin
+tree have been removed after backup. V5 package assets live in `/usr/share/noctalia/`.
 
-## Cache and state
+## Generated files
 
-These are generated at runtime and are usually not worth backing up:
+Do not add rendered palettes to chezmoi: a later apply would reset theme choices.
+This includes `niri/noctalia.kdl`, `kitty/themes/noctalia.conf`, GTK CSS, Qt palettes,
+Yazi's `flavors/noctalia.yazi/flavor.toml`, Vesktop theme CSS, VS Code extension
+colors, Atuin/Macchina themes, Spotify's `Themes/Noctalia/color.ini`, and
+`noctalia/colors.json` for RGB. Noctalia regenerates them when the palette changes.
 
-- `~/.cache/noctalia/`
-  - Weather cache, shell state, notification cache, downloaded images.
-- `~/.cache/cliphist/db`
-  - Clipboard history database.
-- `~/.config/niri/noctalia.kdl`
-  - Regenerated by Noctalia theme application.
-- `~/.config/noctalia/colors.json`
-  - Regenerated by Noctalia when the active scheme changes.
+## Backup and checks
 
-## Practical backup set
+```sh
+~/.config/niri/backup-desktop-configs.sh
+noctalia config validate
+niri validate
+systemctl --user --failed
+noctalia msg panel-open clipboard
+```
 
-For a clean desktop backup, keep these:
+The backup includes Noctalia GUI state and native plugins, GTK 3/4, Spotify and
+VS Code settings, alongside the compositor, terminal, OBS, portal and services.
+The archived OBS WebSocket config contains a credential; keep backups private.
+Use chezmoi to restore managed source, then apply Noctalia templates:
 
-- `~/.config/niri/`
-- `~/.config/noctalia/`
-- `~/.config/kitty/`
-- `~/.config/vesktop/`
-- `~/.config/gtk-3.0/` if you later add GTK theming there
-- `~/.config/systemd/user/`
-- `~/.local/share/applications/`
-
-Optional:
-
-- `~/.zshrc`
-- `~/.nvidia-settings-rc`
-- `~/.cache/cliphist/db` if you want clipboard history preserved
-
-## Quick checks
-
-- Show the main desktop config folders:
-  - `find ~/.config ~/.local/share/applications -maxdepth 3 -type f | sort | rg '/(niri|noctalia|kitty|vesktop|gtk-3.0|systemd/user|applications)'`
-- See clipboard history entries:
-  - `cliphist list`
-- Create a backup archive:
-  - `~/.config/niri/backup-desktop-configs.sh`
+```sh
+chezmoi apply
+noctalia msg config-reload
+noctalia msg templates-apply
+```

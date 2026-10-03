@@ -5,6 +5,7 @@ Personal Arch Linux dotfiles for `niri`, Noctalia, Kitty, zsh, and desktop autom
 ## Repo map
 
 - `dot_zshrc`
+- `dot_default-npm-packages` (mise Node global package restore list)
 - `.chezmoiexternal.toml`
 - `.gitignore`
 - `.pre-commit-config.yaml`
@@ -30,12 +31,17 @@ Personal Arch Linux dotfiles for `niri`, Noctalia, Kitty, zsh, and desktop autom
   - local helper scripts
   - OBS / Noctalia helpers
 - `dot_config/noctalia`
-  - `settings.json`
-  - `user-templates.toml`
+  - native v5 `config.toml` and `templates.toml`
   - local template files for apps outside Noctalia's built-in set
+  - native plugin settings and a pinned OBS Control port
   - OpenRGB integration via local SDK/Python helper
-- `dot_config/obs-studio/basic/profiles`
-  - tracked OBS profile config only
+- `dot_config/obs-studio`
+  - stable OBS profile, global, and user settings
+  - obs-websocket config is tracked encrypted
+- `dot_config/vesktop`
+  - stable Vesktop app and Vencord settings
+- `dot_config/autostart`
+  - selected desktop autostart entries
 - `dot_config/systemd/user`
   - user services for desktop session helpers
 - `dot_config/environment.d`
@@ -43,7 +49,7 @@ Personal Arch Linux dotfiles for `niri`, Noctalia, Kitty, zsh, and desktop autom
 - `dot_config/gtk-3.0`, `dot_config/gtk-4.0`
   - small stable GTK defaults and imports; generated Noctalia CSS stays untracked
 - `dot_config/qt5ct`, `dot_config/qt6ct`
-  - reproducible Qt theme-tool configuration
+  - tracked theme-tool config; generated Noctalia color files stay untracked
 - `dot_local/share/applications`
   - local desktop launcher overrides
 
@@ -56,6 +62,7 @@ Personal Arch Linux dotfiles for `niri`, Noctalia, Kitty, zsh, and desktop autom
 - user systemd units
 - user-session environment overrides
 - stable GTK and Qt theme-tool config
+- selected app settings and autostart entries
 - local desktop entry overrides
 - package manifests and machine snapshots
 - small dependency manifests needed by local integrations
@@ -69,6 +76,7 @@ Personal Arch Linux dotfiles for `niri`, Noctalia, Kitty, zsh, and desktop autom
 - plaintext secrets
 - SSH keys
 - enabled-unit symlinks
+- plugin source trees (OBS uses a pinned external; Headroom uses a local development link)
 - OBS scene collections with PipeWire restore tokens
 
 Portable secrets should be stored with a supported secret workflow instead, e.g. `chezmoi add --encrypt ...` or a password-manager-backed template.
@@ -158,33 +166,47 @@ If you use age-encrypted chezmoi secrets, restore `~/.config/chezmoi/key.txt` an
 
 Notes:
 
-- `dotfiles-bootstrap` installs the tracked native packages, installs `yay` if needed, installs tracked AUR packages, and re-enables tracked user services.
+- `dotfiles-bootstrap` installs the tracked native packages, installs `yay` if needed, installs tracked AUR packages, and re-enables tracked user services, including explicitly enabled template instances exported from `~/.config/systemd/user/*.wants/`. Session-bound units such as Niri/Wayland helpers are only started immediately when a graphical session is already active.
 - `dotfiles-sync` is the one-command live-to-chezmoi workflow: `chezmoi re-add`, snapshot refresh, config validation, and `chezmoi apply`.
 - `project-rename` is the opt-in path-aware rename workflow for projects with Pi or Codex session history. It can do the move itself or repair session metadata after a manual rename.
 - `.pre-commit-config.yaml` runs `gitleaks` through `pre-commit` so staged changes get a local secret scan before commit.
 - `chezmoi` externals install and refresh `~/.oh-my-zsh` from the upstream repository.
-- `mise` is the tracked owner for user-level toolchains like `node`, `pnpm`, `go`, and `uv`.
+- `mise` is the tracked owner for user-level toolchains like `node`, `pnpm`, `go`, `uv`, Herdr, and Spicetify. Node globals are restored from `~/.default-npm-packages`.
 - `dot_local/share/dotfiles/packages/pacman.txt` and `aur.txt` are curated portable baselines.
 - `dot_local/share/dotfiles/packages/*-snapshot.txt` are exact exports from this machine for reference.
 - log into Niri through the packaged Wayland session (`niri.desktop` -> `niri-session`), not a shell `exec niri --session` hack in `~/.zprofile`.
-- `niri` starts `noctalia-shell` directly via `spawn-at-startup`; Noctalia's built-in template pipeline owns theme rendering, and the `colorGeneration` hook reapplies OpenRGB after colors/templates are ready through one serialized SDK client run.
+- `niri` starts native v5 `noctalia` directly via `spawn-at-startup`; the Waytrim watcher is available through manual Niri binds but is not enabled by default, and Noctalia's built-in template pipeline owns theme rendering while the `colors_changed` hook reapplies OpenRGB after colors/templates are ready through one serialized SDK client run.
 - validate `niri` against the live target path `~/.config/niri/config.kdl`, not the raw `chezmoi` source copy, because the live config includes generated `noctalia.kdl` files that are intentionally not tracked.
 - RGB theme sync currently manages the GPU, keyboard, and motherboard headers through the OpenRGB SDK. Corsair RAM is not synced until OpenRGB exposes it on this machine.
 - `~/.config/xdg-desktop-portal/niri-portals.conf` is intentionally tracked on this machine.
 - for this Niri setup, `ScreenCast` is intentionally pinned to `gnome` so Electron/WebRTC apps like Vesktop use niri's current upstream-supported screencast path; `Screenshot` stays on `wlr`.
 - `~/.config/niri/noctalia.kdl` is generated by Noctalia upstream and intentionally not tracked.
-- OBS tracking currently includes the profile `basic.ini`, but not scene collections, because PipeWire restore tokens are machine-specific and should not be committed raw.
+- OBS tracking currently includes stable profile, global, user, and encrypted obs-websocket config, but not scene collections, because PipeWire restore tokens are machine-specific and should not be committed raw.
 
 ## Generated Files
 
 These files are generated at runtime or from tracked source config and should not be edited by hand or committed:
 
 - `~/.config/niri/noctalia.kdl`
-- `~/.config/kitty/current-theme.conf`
+- `~/.config/kitty/themes/noctalia.conf`
 - `~/.config/noctalia/colors.json`
 - `~/.config/gtk-3.0/noctalia.css`
 - `~/.config/gtk-4.0/noctalia.css`
-- `~/.pi/agent/themes/noctalia.json`
+- `~/.config/qt5ct/colors/noctalia.conf`
+- `~/.config/qt6ct/colors/noctalia.conf`
 - `~/.config/atuin/themes/noctalia.toml`
 - `~/.config/macchina/macchina.toml`
 - `~/.config/macchina/themes/Noctalia.toml`
+- `~/.config/yazi/flavors/noctalia.yazi/flavor.toml`
+- `~/.config/spicetify/Themes/Noctalia/color.ini`
+- `~/.config/vesktop/themes/noctalia-material.theme.css`
+
+Native v5 migration, bindings, theme propagation and package cleanup are documented
+in [the Niri setup notes](dot_config/niri/README.md). Application palettes and RGB
+follow Noctalia; GUI overrides remain app-owned in `~/.local/state/noctalia/`.
+
+Headroom is a separate development checkout at `~/projects/headroom`. Chezmoi
+preserves its local plugin symlink and enabled widget; restore that checkout
+separately on a new machine. Its code, cached usage and CLI sign-in files are not
+copied into this repository. Current Noctalia GUI preferences have been captured
+as defaults in `config.toml`; future GUI overrides remain app-owned.

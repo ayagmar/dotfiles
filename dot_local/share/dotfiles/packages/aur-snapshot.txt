@@ -1,7 +1,9 @@
+claude-desktop
 helium-browser-bin
-noctalia-shell
+jetbrains-toolbox
+nautilus-open-any-terminal
 openrgb-git
 python-openrgb-git
 vesktop
+visual-studio-code-bin
 yay
-yay-debug

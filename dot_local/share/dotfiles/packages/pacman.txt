@@ -25,6 +25,7 @@ zoxide
 neovim
 less
 nano
+yazi
 
 # Session and desktop
 networkmanager
@@ -32,15 +33,18 @@ greetd
 greetd-tuigreet
 seatd
 niri
+noctalia
+sound-theme-freedesktop
 kitty
-polkit-kde-agent
 gnome-keyring
 seahorse
 xwayland-satellite
 xdg-user-dirs
 xdg-utils
 xdg-desktop-portal-gnome
+xdg-desktop-portal-gtk
 xdg-desktop-portal-wlr
+nautilus
 qt5ct
 qt6ct
 adw-gtk-theme
@@ -56,12 +60,9 @@ playerctl
 firefox
 mpv
 obs-studio
+swayimg
 vulkan-icd-loader
 
 # Wayland workflow tools
 wl-clipboard
-cliphist
 brightnessctl
-swappy
-swayidle
-swaylock

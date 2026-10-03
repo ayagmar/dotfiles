@@ -1,0 +1,4 @@
+{
+  "mPrimary": "{{colors.primary.default.hex}}",
+  "mSecondary": "{{colors.secondary.default.hex}}"
+}

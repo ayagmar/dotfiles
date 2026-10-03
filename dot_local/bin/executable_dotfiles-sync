@@ -26,10 +26,14 @@ if command -v niri >/dev/null 2>&1 && [[ -f "${HOME}/.config/niri/config.kdl" ]]
     niri validate -c "${HOME}/.config/niri/config.kdl" >/dev/null
 fi
 
+if command -v noctalia >/dev/null 2>&1; then
+    noctalia config validate
+fi
+
 if command -v jq >/dev/null 2>&1; then
     jq empty \
-        "${HOME}/.config/noctalia/settings.json" \
-        "${HOME}/.config/noctalia/plugins.json"
+        "${HOME}/.config/vesktop/settings.json" \
+        "${HOME}/.config/vesktop/settings/settings.json"
 fi
 
 # Bring generated snapshot files back into the target tree too.

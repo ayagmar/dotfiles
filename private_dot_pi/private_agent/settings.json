@@ -1,35 +1,31 @@
 {
-  "lastChangelogVersion": "0.63.1",
+  "lastChangelogVersion": "1.0.0",
   "packages": [
     "npm:pi-codex-web-search",
     "npm:pi-promptsmith",
     "npm:pi-extmgr",
-    {
-      "source": "npm:pi-multi-pass",
-      "extensions": [
-        "+extensions/multi-sub.ts"
-      ]
-    },
     "https://github.com/davebcn87/pi-autoresearch",
     "git:github.com/edxeth/pi-gpt-config",
-    "npm:pi-bash-live-view",
     {
       "source": "npm:pi-anycopy",
       "extensions": [
         "-extensions/anycopy/index.ts"
       ]
-    }
+    },
+    "npm:pi-copilot-queue",
+    "git:github.com/ayagmar/pi-message-recall",
+    "git:git@github.com:leohenon/pi-anthropic-oauth.git"
   ],
   "defaultProvider": "openai-codex-6",
   "defaultModel": "gpt-5.4",
   "defaultThinkingLevel": "xhigh",
-  "hideThinkingBlock": false,
-  "theme": "noctalia",
+  "hideThinkingBlock": true,
+  "theme": "system",
   "gptConfig": {
-    "fastMode": false,
+    "fastMode": true,
     "personality": "none",
     "verbosity": "low",
     "summary": "auto",
-    "showFooter": false
+    "showFooter": true
   }
 }

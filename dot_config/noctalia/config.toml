@@ -1,0 +1,205 @@
+# Desktop preferences; GUI overrides live in ~/.local/state/noctalia/settings.toml.
+[include]
+autoload = false
+files = ["templates.toml"]
+
+[theme]
+mode = "dark"
+source = "builtin"
+builtin = "Ayu"
+
+[shell]
+font_family = "Noto Sans"
+telemetry_enabled = false
+setup_wizard_enabled = false
+polkit_agent = true
+clipboard_enabled = true
+clipboard_auto_paste = "off"
+
+[shell.animation]
+enabled = true
+speed = 1.5
+
+[bar.default]
+position = "top"
+auto_hide = false
+background_opacity = 0.9
+margin_ends = 18
+margin_edge = 12
+widget_spacing = 4
+start = ["workspaces", "spacer", "active_window", "media", "cpu", "memory"]
+center = ["clock"]
+end = ["headroom", "obs", "tray", "notifications", "volume", "control-center"]
+
+[widget.workspaces]
+max_label_chars = 2
+labels_only_when_occupied = true
+hide_when_empty = true
+
+[widget.spacer]
+type = "spacer"
+length = 14
+
+[widget.active_window]
+max_length = 260
+title_scroll = "none"
+
+[widget.media]
+max_length = 145
+artist_first = true
+hide_when_no_media = true
+title_scroll = "on_hover"
+
+[widget.cpu]
+type = "sysmon"
+stat = "cpu_usage"
+color = "primary"
+
+[widget.memory]
+type = "sysmon"
+stat = "ram_pct"
+color = "primary"
+
+[widget.clock]
+format = "%H:%M"
+tooltip_format = "%H:%M %a, %b %d"
+font_family = "Noto Sans Mono"
+color = "secondary"
+
+[dock]
+enabled = false
+
+[wallpaper]
+enabled = true
+directory = "~/Pictures/Wallpapers"
+fill_mode = "crop"
+transition_duration = 1500
+
+[wallpaper.default]
+path = "~/Pictures/Wallpapers/Manga-Portal.png"
+
+[wallpaper.automation]
+enabled = false
+interval_seconds = 300
+order = "random"
+
+[location]
+auto_locate = false
+address = "Rabat, Morocco"
+
+[idle]
+pre_action_fade_seconds = 5
+
+[idle.behavior.lock]
+action = "lock"
+timeout = 300
+enabled = true
+
+[idle.behavior.screen-off]
+action = "screen_off"
+timeout = 330
+enabled = true
+
+[hooks]
+colors_changed = "~/.config/noctalia/scripts/apply-openrgb-theme.py"
+
+[widget.obs]
+type = "ayagmar/obs-control:status"
+
+[plugins]
+enabled = [ "ayagmar/obs-control", "cleboost/jetbrains-provider", "ayagmar/headroom" ]
+auto_update = "all"
+
+    [[plugins.source]]
+    kind = "git"
+    location = "https://github.com/noctalia-dev/official-plugins"
+    name = "official"
+
+    [[plugins.source]]
+    kind = "git"
+    location = "https://github.com/noctalia-dev/community-plugins"
+    name = "community"
+
+[[control_center.shortcuts]]
+type = "dark_mode"
+[[control_center.shortcuts]]
+type = "caffeine"
+[[control_center.shortcuts]]
+type = "notification"
+[[control_center.shortcuts]]
+type = "wallpaper"
+[[control_center.shortcuts]]
+type = "ayagmar/obs-control:quick-controls"
+[[control_center.shortcuts]]
+type = "session"
+
+[shell.launcher.providers."cleboost/jetbrains-provider:provider"]
+prefix = "jb"
+global = true
+
+[plugin_settings."ayagmar/obs-control"]
+python_executable = "~/.local/share/noctalia/obs-control-python/bin/python"
+show_when_idle = false
+show_elapsed_in_bar = true
+
+[shell.launcher]
+auto_paste = "off"
+
+[notification]
+keep_dismissed_in_history = false
+max_visible = 4
+
+[osd.kinds]
+media = false
+
+[audio]
+enable_sounds = false
+
+[plugin_settings."cleboost/jetbrains-provider"]
+max_results = 50
+
+[shell.launcher.providers.session]
+global = true
+
+[shell.launcher.providers.windows]
+global = true
+
+[widget.headroom]
+type = "ayagmar/headroom:usage"
+
+[lockscreen_widgets]
+enabled = false
+schema_version = 2
+widget_order = [ "lockscreen-login-box@DP-1" ]
+
+    [lockscreen_widgets.grid]
+    cell_size = 16
+    major_interval = 4
+    visible = true
+
+    [lockscreen_widgets.widget."lockscreen-login-box@DP-1"]
+    box_height = 196.0
+    box_width = 810.0
+    cx = 1280.0
+    cy = 1258.0
+    output = "DP-1"
+    placement_height = 1440.0
+    placement_width = 2560.0
+    rotation = 0.0
+    type = "login_box"
+
+        [lockscreen_widgets.widget."lockscreen-login-box@DP-1".settings]
+        background_color = "surface_variant"
+        background_opacity = 0.88
+        background_radius = 12.0
+        center_password_text = false
+        input_opacity = 1.0
+        input_radius = 6.0
+        layout = "regular"
+        show_caps_lock = true
+        show_keyboard_layout = true
+        show_login_button = true
+        show_media = true
+        show_session_buttons = true
+        show_unlock_hint = true
+        show_weather = true

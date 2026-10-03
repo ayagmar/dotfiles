@@ -1,4 +1,3 @@
-
 [Default Applications]
 inode/directory=org.gnome.Nautilus.desktop
 x-scheme-handler/discord=vesktop.desktop
@@ -19,3 +18,8 @@ image/svg+xml=swayimg.desktop
 image/tiff=swayimg.desktop
 image/webp=swayimg.desktop
 x-scheme-handler/jetbrains=jetbrainsd.desktop
+x-scheme-handler/claude-cli=claude-code-url-handler.desktop
+x-scheme-handler/claude=com.anthropic.Claude.desktop
+x-scheme-handler/codex=chatgpt.desktop
+
+[Added Associations]

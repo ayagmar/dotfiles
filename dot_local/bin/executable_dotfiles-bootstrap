@@ -87,8 +87,20 @@ enable_user_services() {
     systemctl --user daemon-reload
 
     while IFS= read -r unit; do
+        local wanted_by
+
         [[ -n "$unit" ]] || continue
-        systemctl --user enable --now "$unit"
+        systemctl --user enable "$unit"
+
+        wanted_by="$(systemctl --user show -P WantedBy "$unit" 2>/dev/null || true)"
+        if [[ "$wanted_by" == *graphical-session.target* || "$wanted_by" == *niri.service* ]]; then
+            if systemctl --user --quiet is-active graphical-session.target; then
+                systemctl --user start "$unit"
+            fi
+            continue
+        fi
+
+        systemctl --user start "$unit"
     done < <(read_list "$user_units_list")
 }
 

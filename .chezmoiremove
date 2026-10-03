@@ -1,0 +1,13 @@
+# Noctalia v4 files superseded by native v5 config and plugins.
+.config/noctalia/settings.json
+.config/noctalia/plugins.json
+.config/noctalia/user-templates.toml
+.config/noctalia/v5-templates.toml
+.config/noctalia/plugins
+
+# Pi 1.0 follows Kitty natively through its system theme.
+.pi/agent/themes/noctalia.json
+.config/noctalia/templates/pi-theme.json
+
+# Spotify now uses the palette-only Noctalia theme.
+.config/spicetify/Themes/Comfy

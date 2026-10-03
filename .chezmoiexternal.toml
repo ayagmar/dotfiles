@@ -2,3 +2,10 @@
 type = "git-repo"
 url = "https://github.com/ohmyzsh/ohmyzsh.git"
 refreshPeriod = "168h"
+
+# Native v5 OBS port, pinned while the community-plugin PR is under review.
+[".local/share/noctalia/plugins/obs-control"]
+type = "archive"
+url = "https://github.com/ayagmar/community-plugins/archive/ffd7efe2d476cd666303e1a00f96dd963a1dcca3.tar.gz"
+stripComponents = 2
+include = ["*/obs-control/**"]

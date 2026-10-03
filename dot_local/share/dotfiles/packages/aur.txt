@@ -1,6 +1,8 @@
 # Curated AUR baseline for this desktop setup.
 
 yay
-noctalia-shell
+helium-browser-bin
+jetbrains-toolbox
 openrgb-git
 python-openrgb-git
+vesktop

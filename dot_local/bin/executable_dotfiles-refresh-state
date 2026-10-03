@@ -5,11 +5,19 @@ set -euo pipefail
 repo_dir="${HOME}/.local/share/chezmoi"
 packages_dir="${repo_dir}/dot_local/share/dotfiles/packages"
 systemd_dir="${repo_dir}/dot_local/share/dotfiles/systemd"
+user_systemd_dir="${XDG_CONFIG_HOME:-$HOME/.config}/systemd/user"
 
 mkdir -p "$packages_dir" "$systemd_dir"
 
 pacman -Qqen | sort > "${packages_dir}/pacman-snapshot.txt"
 pacman -Qqem | sort > "${packages_dir}/aur-snapshot.txt"
-systemctl --user list-unit-files --state=enabled --no-legend | awk '{print $1}' | sort > "${systemd_dir}/user-enabled.txt"
+{
+    systemctl --user list-unit-files --state=enabled --no-legend | awk '{print $1}'
+
+    if [[ -d "$user_systemd_dir" ]]; then
+        find "$user_systemd_dir" -mindepth 2 -maxdepth 2 -type l -printf '%P\n' \
+            | awk -F/ '$1 ~ /\.wants$/ { print $2 }'
+    fi
+} | sort -u > "${systemd_dir}/user-enabled.txt"
 
 printf 'Refreshed package and user-service manifests in %s\n' "$repo_dir"

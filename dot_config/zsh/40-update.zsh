@@ -22,7 +22,7 @@ update() {
       ;;
   esac
 
-  local -a failed_steps orphans npm_globals pnpm_globals
+  local -a failed_steps orphans npm_globals pnpm_globals aur_fresh
   local -a repo_before repo_after aur_before aur_after flatpak_before flatpak_after
   local -a repo_updated_lines aur_updated_lines flatpak_updated_lines
   local -a yay_upgrade_args
@@ -38,6 +38,15 @@ update() {
   local total_pending_after=0
   local total_updated_entries=0
   local mode_label='interactive'
+  # Supply-chain cooldown: only install versions at least N days old, so freshly
+  # published (potentially compromised) releases have time to be caught/yanked.
+  # Applied where the tool supports it (npm/pnpm/uv/mise); Arch repos, AUR,
+  # flatpak and snap have no native min-age knob and are left as-is.
+  local min_age_days=${UPDATE_MIN_AGE_DAYS:-7}
+  local min_age_minutes=$(( min_age_days * 1440 ))
+  local min_age_before=''
+  min_age_before=$(date -u -d "${min_age_days} days ago" +%Y-%m-%dT%H:%M:%SZ 2>/dev/null \
+    || date -u -v-${min_age_days}d +%Y-%m-%dT%H:%M:%SZ 2>/dev/null)
   local line=''
   local package_name=''
 
@@ -88,6 +97,7 @@ update() {
 
   print -P '%F{cyan}==> Update plan%f'
   print "  Mode: $mode_label"
+  print "  Min release age: ${min_age_days}d (npm/pnpm/uv/mise; not Arch/AUR/flatpak/snap)"
   print "  Arch repo pending: ${#repo_before[@]}"
   print "  AUR pending: ${#aur_before[@]}"
   print "  Flatpak pending: ${#flatpak_before[@]}"
@@ -102,7 +112,32 @@ update() {
   fi
 
   if command -v yay >/dev/null 2>&1; then
-    yay_upgrade_args=(-Syu --devel --timeupdate)
+    yay_upgrade_args=(-Syu --devel)
+
+    # AUR supply-chain cooldown: hold back AUR packages whose PKGBUILD was
+    # updated within the last min_age_days (per AUR RPC LastModified), so a
+    # freshly pushed (possibly compromised) PKGBUILD isn't built immediately.
+    # They get picked up automatically once they age past the threshold.
+    # Note: devel (-git etc.) packages track upstream commits, not LastModified,
+    # so they are not gated here; official repo packages have no age knob.
+    aur_fresh=()
+    if (( min_age_days > 0 )) && (( ${#aur_before[@]} )) \
+       && command -v curl >/dev/null 2>&1 && command -v jq >/dev/null 2>&1; then
+      local _rpc='' _nm=''
+      for line in "${aur_before[@]}"; do
+        _nm=${line%% *}
+        [[ -n "$_nm" ]] && _rpc+="&arg[]=${_nm}"
+      done
+      if [[ -n "$_rpc" ]]; then
+        local _cutoff=$(( $(date +%s) - min_age_days * 86400 ))
+        aur_fresh=("${(@f)$(curl -fsS --max-time 15 "https://aur.archlinux.org/rpc/v5/info?${_rpc#&}" 2>/dev/null \
+          | jq -r --argjson cutoff "$_cutoff" '.results[] | select(.LastModified > $cutoff) | .Name' 2>/dev/null || true)}")
+        aur_fresh=("${(@)aur_fresh:#}")
+      fi
+    fi
+    if (( ${#aur_fresh[@]} )); then
+      yay_upgrade_args+=(--ignore "${(j:,:)aur_fresh}")
+    fi
 
     if (( yes_mode )); then
       yay_upgrade_args+=(
@@ -116,6 +151,9 @@ update() {
 
     print ''
     print -P '%F{cyan}==> Arch packages (yay)%f'
+    if (( ${#aur_fresh[@]} )); then
+      print -P "%F{yellow}  Cooldown: holding ${#aur_fresh[@]} AUR pkg(s) newer than ${min_age_days}d: ${(j:, :)aur_fresh}%f"
+    fi
     yay "${yay_upgrade_args[@]}" || {
       failed_steps+=('yay')
       exit_code=1
@@ -246,7 +284,7 @@ update() {
 
     print ''
     print -P '%F{cyan}==> mise runtimes%f'
-    mise upgrade -y || {
+    MISE_MINIMUM_RELEASE_AGE="${min_age_days}d" mise upgrade -y || {
       failed_steps+=('mise upgrade')
       exit_code=1
     }
@@ -262,16 +300,23 @@ update() {
   if (( ${#npm_globals[@]} )); then
     print ''
     print -P '%F{cyan}==> Global npm packages%f'
-    npm update -g || {
+    # mise installs each node version into its own prefix, so `npm update -g`
+    # does nothing after a node upgrade wipes globals. Reinstall the captured
+    # list (installs latest = restore + update), keep mise's default-packages
+    # file in sync so future node installs self-heal, then reshim.
+    print -l -- "${npm_globals[@]}" > ~/.default-npm-packages
+    if npm install -g --min-release-age "$min_age_days" "${npm_globals[@]}"; then
+      command -v mise > /dev/null 2>&1 && mise reshim 2>/dev/null
+    else
       failed_steps+=('npm globals')
       exit_code=1
-    }
+    fi
   fi
 
   if (( ${#pnpm_globals[@]} )); then
     print ''
     print -P '%F{cyan}==> Global pnpm packages%f'
-    pnpm update -g || {
+    pnpm update -g --config.minimumReleaseAge=$min_age_minutes || {
       failed_steps+=('pnpm globals')
       exit_code=1
     }
@@ -280,7 +325,7 @@ update() {
   if (( uv_tool_count > 0 )); then
     print ''
     print -P '%F{cyan}==> uv tools%f'
-    uv tool upgrade --all || {
+    uv tool upgrade --all ${min_age_before:+--exclude-newer "$min_age_before"} || {
       failed_steps+=('uv tools')
       exit_code=1
     }

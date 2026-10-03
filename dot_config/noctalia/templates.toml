@@ -1,0 +1,27 @@
+[theme.templates]
+enable_builtin_templates = true
+builtin_ids = ["niri", "kitty", "gtk3", "gtk4", "qt", "btop"]
+enable_community_templates = true
+community_ids = ["discord", "vscode", "yazi"]
+
+[theme.templates.user.openrgb_colors]
+input_path = "~/.config/noctalia/templates/openrgb-colors.json"
+output_path = "~/.config/noctalia/colors.json"
+
+[theme.templates.user.atuin]
+input_path = "~/.config/noctalia/templates/atuin-theme.toml"
+output_path = "~/.config/atuin/themes/noctalia.toml"
+
+[theme.templates.user.macchina_config]
+input_path = "~/.config/noctalia/templates/macchina-config.toml"
+output_path = "~/.config/macchina/macchina.toml"
+
+[theme.templates.user.macchina_theme]
+input_path = "~/.config/noctalia/templates/macchina-theme.toml"
+output_path = "~/.config/macchina/themes/Noctalia.toml"
+
+[theme.templates.user.spotify]
+input_path = "~/.config/noctalia/templates/spicetify-colors.ini"
+output_path = "~/.config/spicetify/Themes/Noctalia/color.ini"
+post_hook = "mise exec github:spicetify/cli -- spicetify -q apply --no-restart"
+hook_async = false

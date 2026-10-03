@@ -1,11 +1,11 @@
 // This config is in the KDL format: https://kdl.dev
 // "/-" comments out the following node.
 // Check the wiki for a full description of the configuration:
-// https://yalter.github.io/niri/Configuration:-Introduction
+// https://niri-wm.github.io/niri/Configuration:-Introduction
 
 // Input device configuration.
 // Find the full list of options on the wiki:
-// https://yalter.github.io/niri/Configuration:-Input
+// https://niri-wm.github.io/niri/Configuration:-Input
 input {
     keyboard {
         xkb {
@@ -44,7 +44,7 @@ input {
 // You can configure outputs by their name, which you can find
 // by running `niri msg outputs` while inside a niri instance.
 // Find more information on the wiki:
-// https://yalter.github.io/niri/Configuration:-Outputs
+// https://niri-wm.github.io/niri/Configuration:-Outputs
 output "DP-1" {
     mode "2560x1440@359.979"
     scale 1
@@ -53,7 +53,7 @@ output "DP-1" {
 
 // Settings that influence how windows are positioned and sized.
 // Find more information on the wiki:
-// https://yalter.github.io/niri/Configuration:-Layout
+// https://niri-wm.github.io/niri/Configuration:-Layout
 layout {
     // Set gaps around windows in logical pixels.
     gaps 10
@@ -137,12 +137,9 @@ layout {
 // See the binds section below for more spawn examples.
 
 // Start Noctalia the way its upstream docs recommend for Niri.
-spawn-at-startup "qs" "-c" "noctalia-shell" "--no-duplicate"
-// Import Wayland session variables for user services, then restart the enabled
-// waytrim watcher unit inside the real Niri session.
-spawn-at-startup "sh" "-lc" "\"$HOME/.config/niri/scripts/waytrim-watch-session\""
+spawn-at-startup "noctalia"
 // To run a shell command (with variables, pipes, etc.), use spawn-sh-at-startup:
-// spawn-sh-at-startup "qs -c ~/source/qs/MyAwesomeShell"
+// spawn-sh-at-startup "your-command"
 
 hotkey-overlay {
     // Uncomment this line to disable the "Important Hotkeys" pop-up at startup.
@@ -166,7 +163,7 @@ screenshot-path "~/Pictures/Screenshots/Screenshot from %Y-%m-%d %H-%M-%S.png"
 
 // Animation settings.
 // The wiki explains how to configure individual animations:
-// https://yalter.github.io/niri/Configuration:-Animations
+// https://niri-wm.github.io/niri/Configuration:-Animations
 animations {
     // Uncomment to turn off all animations.
     // off
@@ -177,17 +174,7 @@ animations {
 
 // Window rules let you adjust behavior for individual windows.
 // Find more information on the wiki:
-// https://yalter.github.io/niri/Configuration:-Window-Rules
-
-// Work around WezTerm's initial configure bug
-// by setting an empty default-column-width.
-window-rule {
-    // This regular expression is intentionally made as specific as possible,
-    // since this is the default config, and we want no false positives.
-    // You can get away with just app-id="wezterm" if you want.
-    match app-id=r#"^org\.wezfurlong\.wezterm$"#
-    default-column-width {}
-}
+// https://niri-wm.github.io/niri/Configuration:-Window-Rules
 
 // Open the Firefox picture-in-picture player as floating by default.
 window-rule {
@@ -201,6 +188,13 @@ window-rule {
 window-rule {
     match app-id=r#"^com\.obsproject\.Studio$"# title="^Remux Recordings$"
     open-focused false
+}
+
+window-rule {
+    match app-id="dev.noctalia.Noctalia"
+    open-floating true
+    default-column-width { fixed 1080; }
+    default-window-height { fixed 920; }
 }
 
 window-rule {
@@ -250,26 +244,27 @@ binds {
     // Suggested binds for running programs: terminal, app launcher, screen locker.
     Mod+Return hotkey-overlay-title="Open a Terminal: Kitty" { spawn "kitty"; }
     Mod+B hotkey-overlay-title="Open Browser: Helium" { spawn "/home/ayagmar/.local/bin/helium-browser-detached"; }
-    // Follow Noctalia's documented Niri IPC pattern for shell actions.
-    Mod+Space hotkey-overlay-title="Open Noctalia Launcher" { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "launcher" "toggle"; }
-    Mod+V hotkey-overlay-title="Open Noctalia Clipboard History" { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "launcher" "clipboard"; }
-    Mod+C hotkey-overlay-title="Open Noctalia ControlCenter" { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "controlCenter" "toggle"; }
-    Mod+E hotkey-overlay-title="Open Noctalia Emoji Picker" { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "launcher" "emoji"; }
-    Mod+Alt+C hotkey-overlay-title="Open Noctalia Settings" { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "settings" "toggle"; }
+    // Noctalia v5 IPC actions.
+    Alt+Tab hotkey-overlay-title="Switch Windows" { spawn "noctalia" "msg" "window-switcher" "hold"; }
+    Mod+Space hotkey-overlay-title="Open Noctalia Launcher" { spawn "noctalia" "msg" "panel-toggle" "launcher"; }
+    Mod+V hotkey-overlay-title="Open Noctalia Clipboard History" { spawn "noctalia" "msg" "panel-toggle" "clipboard"; }
+    Mod+C hotkey-overlay-title="Open Noctalia ControlCenter" { spawn "noctalia" "msg" "panel-toggle" "control-center"; }
+    Mod+E hotkey-overlay-title="Open Noctalia Emoji Picker" { spawn "noctalia" "msg" "panel-toggle" "launcher" "/emo"; }
+    Mod+Alt+C hotkey-overlay-title="Open Noctalia Settings" { spawn "noctalia" "msg" "settings-toggle"; }
     Mod+Alt+N hotkey-overlay-title="Restart Noctalia Shell" { spawn-sh "\"$HOME/.config/niri/scripts/noctaliactl\" restart-shell"; }
     Mod+Alt+V hotkey-overlay-title="Repair Clipboard with Waytrim" { spawn "waytrim" "prose" "--clipboard"; }
     Mod+Alt+R hotkey-overlay-title="Restore Original Clipboard Text" { spawn-sh "\"$HOME/.config/niri/scripts/waytrim-restore-clipboard\""; }
     Mod+Alt+A hotkey-overlay-title="Set Waytrim Watcher to Auto" { spawn-sh "\"$HOME/.config/niri/scripts/waytrim-watch-mode\" auto"; }
     Mod+Alt+P hotkey-overlay-title="Set Waytrim Watcher to Prose" { spawn-sh "\"$HOME/.config/niri/scripts/waytrim-watch-mode\" prose"; }
     Mod+Alt+X hotkey-overlay-title="Stop Waytrim Watcher" { spawn-sh "\"$HOME/.config/niri/scripts/waytrim-watch-mode\" stop"; }
-    Mod+Shift+W hotkey-overlay-title="Open Noctalia Wallpaper Selector" { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "wallpaper" "toggle"; }
-    Mod+Ctrl+W hotkey-overlay-title="Toggle Wallpaper Automation" { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "wallpaper" "toggleAutomation"; }
-    Mod+D hotkey-overlay-title="Toggle Noctalia Dark Mode" { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "darkMode" "toggle"; }
-    Super+Alt+L hotkey-overlay-title="Open Noctalia Lock Screen" { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "lockScreen" "lock"; }
-    Super+F9 hotkey-overlay-title="Toggle OBS Recording" { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "plugin:obs-control" "toggleRecord"; }
-    Super+F10 hotkey-overlay-title="Toggle OBS Replay Buffer" { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "plugin:obs-control" "toggleReplay"; }
-    Super+F11 hotkey-overlay-title="Save OBS Replay Buffer" { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "plugin:obs-control" "saveReplay"; }
-    Super+F12 hotkey-overlay-title="Launch OBS" { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "plugin:obs-control" "launchObs"; }
+    Mod+Shift+W hotkey-overlay-title="Open Noctalia Wallpaper Selector" { spawn "noctalia" "msg" "panel-toggle" "wallpaper"; }
+    Mod+Ctrl+W hotkey-overlay-title="Open Wallpaper Automation Settings" { spawn "noctalia" "msg" "settings-open" "wallpaper"; }
+    Mod+D hotkey-overlay-title="Toggle Noctalia Dark Mode" { spawn "noctalia" "msg" "theme-mode-toggle"; }
+    Super+Alt+L hotkey-overlay-title="Open Noctalia Lock Screen" { spawn "noctalia" "msg" "session" "lock"; }
+    Super+F9 hotkey-overlay-title="Toggle OBS Recording" { spawn "noctalia" "msg" "plugin" "ayagmar/obs-control:controller" "all" "toggle-record"; }
+    Super+F10 hotkey-overlay-title="Toggle OBS Replay Buffer" { spawn "noctalia" "msg" "plugin" "ayagmar/obs-control:controller" "all" "toggle-replay"; }
+    Super+F11 hotkey-overlay-title="Save OBS Replay" { spawn "noctalia" "msg" "plugin" "ayagmar/obs-control:controller" "all" "save-replay"; }
+    Super+F12 hotkey-overlay-title="Launch OBS" { spawn "noctalia" "msg" "plugin" "ayagmar/obs-control:controller" "all" "launch"; }
 
     // Use spawn-sh to run a shell command. Do this if you need pipes, multiple commands, etc.
     // Note: the entire command goes as a single argument. It's passed verbatim to `sh -c`.

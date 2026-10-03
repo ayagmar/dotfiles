@@ -17,15 +17,20 @@ CLIENT_NAME = "NoctaliaRGB"
 RETRY_COUNT = 6
 RETRY_DELAY_SECONDS = 1.0
 LOCK_NAME = "noctalia-openrgb.lock"
+GLOBAL_BRIGHTNESS_BOOST = 1.2
+MOTHERBOARD_BRIGHTNESS_BOOST = 1.4
+CASE_BRIGHTNESS_BOOST = 1.5
 ADDRESSABLE_MOTHERBOARD_ZONES = {
-    "JARGB 1": 20,  # case strip / cage lighting
-    "JARGB 2": 20,  # 3 bottom fans + rear fan
-    "JARGB 3": 20,  # top radiator fans
+    "JARGB 1": 60,  # case strip / cage lighting
+    "JARGB 2": 60,  # 3 bottom fans + rear fan
+    "JARGB 3": 60,  # top radiator fans
 }
 
 
 def config_path(*parts: str) -> str:
-    base = os.environ.get("XDG_CONFIG_HOME", os.path.join(os.environ["HOME"], ".config"))
+    base = os.environ.get(
+        "XDG_CONFIG_HOME", os.path.join(os.environ["HOME"], ".config")
+    )
     return os.path.join(base, *parts)
 
 
@@ -46,9 +51,26 @@ def read_json(path: str) -> dict:
         return json.load(handle)
 
 
+def scale_channel(value: int, boost: float) -> int:
+    return max(0, min(255, round(value * boost)))
+
+
+def boost_color(color: RGBColor, boost: float) -> RGBColor:
+    if boost == 1.0:
+        return color
+
+    return RGBColor(
+        scale_channel(color.red, boost),
+        scale_channel(color.green, boost),
+        scale_channel(color.blue, boost),
+    )
+
+
 def read_accent_color() -> RGBColor:
     colors = read_json(config_path("noctalia", "colors.json"))
-    accent = str(colors.get("mSecondary") or colors.get("mPrimary") or "#a9aefe")
+    accent = colors["mPrimary"]
+    if not isinstance(accent, str) or not re.fullmatch(r"#[0-9a-fA-F]{6}", accent):
+        raise ValueError("Noctalia primary color must be a #RRGGBB string")
     return RGBColor.fromHEX(accent)
 
 
@@ -74,10 +96,14 @@ def connect_client() -> OpenRGBClient:
             if attempt < RETRY_COUNT - 1:
                 time.sleep(RETRY_DELAY_SECONDS)
 
-    raise RuntimeError(f"failed to connect to OpenRGB SDK at {HOST}:{PORT}") from last_error
+    raise RuntimeError(
+        f"failed to connect to OpenRGB SDK at {HOST}:{PORT}"
+    ) from last_error
 
 
-def find_first_by_type(client: OpenRGBClient, device_type: DeviceType, pattern: str | None = None):
+def find_first_by_type(
+    client: OpenRGBClient, device_type: DeviceType, pattern: str | None = None
+):
     devices = client.get_devices_by_type(device_type)
     if pattern is None:
         return devices[0] if devices else None
@@ -98,13 +124,19 @@ def find_first_by_name(client: OpenRGBClient, pattern: str):
 
 
 def set_mode(device, *modes: str) -> bool:
+    last_error = None
     for mode in modes:
         try:
             device.set_mode(mode)
+        except Exception as exc:  # noqa: BLE001
+            last_error = exc
+        else:
             time.sleep(0.15)
             return True
-        except Exception:  # noqa: BLE001
-            continue
+    print(
+        f"Could not set a solid-color mode on {device.name}: {last_error}",
+        file=sys.stderr,
+    )
     return False
 
 
@@ -128,7 +160,7 @@ def ensure_zone_size(zone, zone_size: int) -> None:
     time.sleep(0.15)
 
 
-def apply_motherboard(device, color: RGBColor) -> None:
+def apply_motherboard(device, color: RGBColor, case_color: RGBColor) -> None:
     if not set_mode(device, "Direct", "Static"):
         return
 
@@ -141,10 +173,18 @@ def apply_motherboard(device, color: RGBColor) -> None:
     for zone in zones:
         zone_size = addressable_motherboard_zone_size(zone)
         if zone_size is None:
+            try:
+                zone.set_color(color)
+                time.sleep(0.1)
+            except Exception as exc:  # noqa: BLE001
+                print(
+                    f"Could not color {device.name} zone {zone.name}: {exc}",
+                    file=sys.stderr,
+                )
             continue
 
         ensure_zone_size(zone, zone_size)
-        zone.set_color(color)
+        zone.set_color(case_color)
         time.sleep(0.1)
 
 
@@ -162,18 +202,25 @@ def main() -> int:
 
     lock_fd = acquire_lock()
     try:
-        color = read_accent_color()
+        base_color = read_accent_color()
+        color = boost_color(base_color, GLOBAL_BRIGHTNESS_BOOST)
+        motherboard_color = boost_color(base_color, MOTHERBOARD_BRIGHTNESS_BOOST)
+        case_color = boost_color(base_color, CASE_BRIGHTNESS_BOOST)
         client = connect_client()
         try:
             keyboard = find_first_by_type(client, DeviceType.KEYBOARD, r"apex pro")
             if keyboard is not None:
                 apply_keyboard(keyboard, color)
 
-            motherboard = find_first_by_type(client, DeviceType.MOTHERBOARD, r"msi mystic light|x870|msi")
+            motherboard = find_first_by_type(
+                client, DeviceType.MOTHERBOARD, r"msi mystic light|x870|msi"
+            )
             if motherboard is not None:
-                apply_motherboard(motherboard, color)
+                apply_motherboard(motherboard, motherboard_color, case_color)
 
-            gpu = find_first_by_type(client, DeviceType.GPU, r"5090|waterforce|gigabyte")
+            gpu = find_first_by_type(
+                client, DeviceType.GPU, r"5090|waterforce|gigabyte"
+            )
             if gpu is None:
                 gpu = find_first_by_name(client, r"5090|waterforce|gigabyte")
             if gpu is not None:
