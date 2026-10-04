@@ -33,7 +33,7 @@ untracked. Discord screenshot credentials stay encrypted or local-only.
 - `~/.local/state/noctalia/settings.toml`: GUI overrides; preserve these when restoring.
 - `~/.local/state/noctalia/state.toml`: app-owned runtime state.
 - `~/.local/share/noctalia/plugins/`: native v5 Luau plugins. The OBS port is
-  temporarily installed from a pinned chezmoi external; Headroom links to the
+  installed and updated from Noctalia's community source; Headroom links to the
   separate development checkout at `~/projects/headroom`; JetBrains uses Noctalia.
 - `~/.local/share/noctalia/obs-control-python/`: reproducible Python environment,
   recreated by the chezmoi onchange script.

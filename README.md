@@ -33,7 +33,7 @@ Personal Arch Linux dotfiles for `niri`, Noctalia, Kitty, zsh, and desktop autom
 - `dot_config/noctalia`
   - native v5 `config.toml` and `templates.toml`
   - local template files for apps outside Noctalia's built-in set
-  - native plugin settings and a pinned OBS Control port
+  - native plugin settings and community OBS Control integration
   - OpenRGB integration via local SDK/Python helper
 - `dot_config/obs-studio`
   - stable OBS profile, global, and user settings
@@ -76,7 +76,7 @@ Personal Arch Linux dotfiles for `niri`, Noctalia, Kitty, zsh, and desktop autom
 - plaintext secrets
 - SSH keys
 - enabled-unit symlinks
-- plugin source trees (OBS uses a pinned external; Headroom uses a local development link)
+- plugin source trees (OBS uses Noctalia's community source; Headroom uses a local development link)
 - OBS scene collections with PipeWire restore tokens
 
 Portable secrets should be stored with a supported secret workflow instead, e.g. `chezmoi add --encrypt ...` or a password-manager-backed template.

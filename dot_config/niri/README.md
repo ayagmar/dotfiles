@@ -98,13 +98,15 @@ bind replaces that old action. The native JetBrains provider is enabled with
 `jb` as its prefix and also participates in global search. Clipboard, idle lock,
 polkit and notifications use Noctalia's native services.
 
-The OBS port is pinned in `.chezmoiexternal.toml` while its upstream PR is reviewed.
+OBS Control is installed and updated by Noctalia from its community source.
+The temporary chezmoi archive override has been removed after the upstream merge.
+The configured `[plugins].enabled` entry activates it on restore; you can also run
+`noctalia msg plugins enable ayagmar/obs-control` while Noctalia is running.
 
-An onchange installation script creates its isolated Python environment using the
-plugin's pinned `requirements.txt`. For a port update, change the archive revision
-and the script revision together. Once accepted upstream, use Noctalia's plugin
-installer and remove the temporary archive override. Keep an interpreter with
-`websocket-client` installed in the plugin settings.
+An onchange installation script creates its isolated Python dependency environment
+with `websocket-client==1.9.2`, matching community OBS Control 1.0.0's requirements.
+It runs independently of plugin installation, so chezmoi can provision it before
+Noctalia starts. Check upstream requirements when updating that dependency pin.
 
 The Session power menu also includes **Reboot to Windows**, with shortcut `7`
 while the menu is open and a ten-second countdown. It asks for administrator
