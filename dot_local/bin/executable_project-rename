@@ -6,8 +6,11 @@ fix_only=0
 dry_run=0
 pi_only=0
 codex_only=0
+claude_only=0
 pi_agent_dir="${HOME}/.pi/agent"
 codex_home="${HOME}/.codex"
+claude_home="${HOME}/.claude"
+claude_config="${HOME}/.claude.json"
 have_sqlite3=0
 sqlite3_warning_emitted=0
 
@@ -18,23 +21,32 @@ pi_dirs_moved=0
 pi_files_updated=0
 codex_jsonl_updated=0
 codex_db_rows_updated=0
+claude_dirs_moved=0
+claude_files_updated=0
+claude_config_keys_updated=0
 
 usage() {
   cat <<'EOF'
 Usage: project-rename [options] <old_path> <new_path>
 
-Rename a project directory and repair Pi/Codex session metadata for that path.
+Rename a project directory and repair Pi/Codex/Claude Code session metadata for that path.
 
 The rename is subtree-aware: if you rename `/a/Old` to `/a/old`, session metadata for
 nested projects like `/a/Old/app` is repaired too.
 
+Close running Claude Code sessions first: Claude Code rewrites ~/.claude.json and keeps
+appending to the session file of the old path while it runs.
+
 Options:
-  --fix-only               Do not move the project directory; only repair Pi/Codex state
+  --fix-only               Do not move the project directory; only repair session state
   --dry-run                Print planned changes without modifying anything
   --pi-only                Only repair Pi session state
   --codex-only             Only repair Codex session state
+  --claude-only            Only repair Claude Code session state
   --pi-agent-dir <path>    Override Pi agent dir (default: ~/.pi/agent)
   --codex-home <path>      Override Codex home (default: ~/.codex)
+  --claude-home <path>     Override Claude Code home (default: ~/.claude)
+  --claude-config <path>   Override Claude Code config (default: ~/.claude.json)
   -h, --help               Show this help
 EOF
 }
@@ -483,6 +495,215 @@ repair_codex_sessions() {
   shopt -u nullglob
 }
 
+encode_claude_project_dir() {
+  printf '%s\n' "$1" | sed 's/[^A-Za-z0-9]/-/g'
+}
+
+# Rewrite one JSON field (`cwd` or `project`) on the lines that mention the old path.
+# Other lines are copied verbatim so jq never reformats them.
+patch_claude_jsonl_field() {
+  local file_path="$1"
+  local field="$2"
+  local old_cwd="$3"
+  local new_cwd="$4"
+  local needle="\"${field}\":\"${old_cwd}"
+  local tmp_file changed line updated
+
+  grep -qF -- "$needle" "$file_path" || return 1
+
+  changed=0
+  tmp_file="$(mktemp)"
+
+  while IFS= read -r line || [[ -n "$line" ]]; do
+    if [[ "$line" == *"$needle"* ]]; then
+      updated="$(printf '%s\n' "$line" | jq -c --arg field "$field" --arg old_cwd "$old_cwd" --arg new_cwd "$new_cwd" '
+        walk(
+          if type == "object" and (.[$field] | type) == "string"
+             and (.[$field] == $old_cwd or (.[$field] | startswith($old_cwd + "/")))
+            then .[$field] = $new_cwd + .[$field][($old_cwd | length):]
+            else .
+            end)')"
+      if [[ "$updated" != "$line" ]]; then
+        changed=1
+        line="$updated"
+      fi
+    fi
+    printf '%s\n' "$line" >> "$tmp_file"
+  done < "$file_path"
+
+  if (( !changed )) || (( dry_run )); then
+    rm -f "$tmp_file"
+    return $(( !changed ))
+  fi
+
+  mv "$tmp_file" "$file_path"
+}
+
+# Move src into dst; when dst exists, merge recursively. Identical files are deduplicated,
+# differing files stop the run.
+merge_claude_dir() {
+  local src="$1"
+  local dst="$2"
+  local item target
+
+  if [[ ! -e "$dst" ]]; then
+    mkdir -p "$(dirname "$dst")"
+    mv "$src" "$dst"
+    return
+  fi
+
+  shopt -s nullglob dotglob
+  for item in "$src"/*; do
+    target="$dst/$(basename "$item")"
+    if [[ ! -e "$target" ]]; then
+      mv "$item" "$target"
+    elif [[ -d "$item" && -d "$target" ]]; then
+      merge_claude_dir "$item" "$target"
+    elif cmp -s "$item" "$target"; then
+      rm -f "$item"
+    else
+      printf 'Cannot merge Claude project dir; different file already exists: %s\n' "$target" >&2
+      exit 1
+    fi
+  done
+  shopt -u nullglob dotglob
+  rmdir "$src"
+}
+
+claude_project_dir_cwd() {
+  local dir="$1"
+  local session_file
+
+  for session_file in "$dir"/*.jsonl; do
+    [[ -f "$session_file" ]] || continue
+    grep -m 1 -o '"cwd":"[^"]*"' "$session_file" | jq -r '"{\(.)}" | fromjson | .cwd' 2>/dev/null && return
+  done
+  return 0
+}
+
+repair_claude_projects() {
+  local old_cwd="$1"
+  local new_cwd="$2"
+  local projects_root="$claude_home/projects"
+  local dir cwd new_dir session_file
+  local -A target_dirs=()
+
+  if [[ ! -d "$projects_root" ]]; then
+    return 0
+  fi
+
+  shopt -s nullglob
+  for dir in "$projects_root"/*; do
+    [[ -d "$dir" ]] || continue
+
+    cwd="$(claude_project_dir_cwd "$dir")"
+    if [[ -z "$cwd" && "$(basename "$dir")" == "$(encode_claude_project_dir "$old_cwd")" ]]; then
+      cwd="$old_cwd"
+    fi
+    [[ -n "$cwd" ]] || continue
+    path_matches_prefix "$cwd" "$old_cwd" || continue
+
+    new_dir="$projects_root/$(encode_claude_project_dir "$(rewrite_prefix "$cwd" "$old_cwd" "$new_cwd")")"
+    target_dirs["$new_dir"]=1
+    [[ "$dir" != "$new_dir" ]] || continue
+
+    if (( dry_run )); then
+      if [[ -d "$new_dir" ]]; then
+        printf '[dry-run] merge Claude project dir %s -> %s\n' "$dir" "$new_dir"
+      else
+        printf '[dry-run] mv %s -> %s\n' "$dir" "$new_dir"
+      fi
+      target_dirs["$dir"]=1
+    else
+      merge_claude_dir "$dir" "$new_dir"
+      printf 'Moved Claude project dir: %s -> %s\n' "$dir" "$new_dir"
+    fi
+    claude_dirs_moved=$((claude_dirs_moved + 1))
+  done
+  shopt -u nullglob
+
+  for dir in "${!target_dirs[@]}"; do
+    [[ -d "$dir" ]] || continue
+    while IFS= read -r -d '' session_file; do
+      if patch_claude_jsonl_field "$session_file" cwd "$old_cwd" "$new_cwd"; then
+        if (( dry_run )); then
+          printf '[dry-run] update Claude session cwd: %s\n' "$session_file"
+        fi
+        claude_files_updated=$((claude_files_updated + 1))
+      fi
+    done < <(find "$dir" -type f -name '*.jsonl' -print0)
+  done
+}
+
+repair_claude_history() {
+  local old_cwd="$1"
+  local new_cwd="$2"
+  local history_file="$claude_home/history.jsonl"
+
+  [[ -f "$history_file" ]] || return 0
+
+  if patch_claude_jsonl_field "$history_file" project "$old_cwd" "$new_cwd"; then
+    if (( dry_run )); then
+      printf '[dry-run] update Claude prompt history: %s\n' "$history_file"
+    fi
+    claude_files_updated=$((claude_files_updated + 1))
+  fi
+}
+
+# Rename the per-project entries of ~/.claude.json (trust, allowed tools, MCP settings,
+# last session). When both old and new keys exist, the new entry wins and allowed tools are merged.
+repair_claude_config() {
+  local old_cwd="$1"
+  local new_cwd="$2"
+  local tmp_file count
+
+  [[ -f "$claude_config" ]] || return 0
+
+  count="$(jq --arg old_cwd "$old_cwd" '
+    [.projects // {} | keys[] | select(. == $old_cwd or startswith($old_cwd + "/"))] | length' "$claude_config")"
+  (( count > 0 )) || return 0
+
+  if (( dry_run )); then
+    printf '[dry-run] rename Claude config project keys: %s in %s\n' "$count" "$claude_config"
+    claude_config_keys_updated=$((claude_config_keys_updated + count))
+    return
+  fi
+
+  tmp_file="$(mktemp)"
+  jq --arg old_cwd "$old_cwd" --arg new_cwd "$new_cwd" '
+    def rename_prefix($from; $to):
+      if . == $from then $to
+      elif startswith($from + "/") then $to + .[($from | length):]
+      else .
+      end;
+    .projects |= (
+      to_entries
+      | map(.key |= rename_prefix($old_cwd; $new_cwd))
+      | group_by(.key)
+      | map({
+          key: .[0].key,
+          value: ((reduce .[].value as $v ({}; . * $v))
+            + {allowedTools: ([.[].value.allowedTools // []] | add | unique)})
+        })
+      | from_entries)' "$claude_config" > "$tmp_file"
+  mv "$tmp_file" "$claude_config"
+  printf 'Renamed Claude config project keys: %s\n' "$count"
+  claude_config_keys_updated=$((claude_config_keys_updated + count))
+}
+
+repair_claude_sessions() {
+  local old_cwd="$1"
+  local new_cwd="$2"
+
+  if pgrep -x claude >/dev/null 2>&1; then
+    add_warning 'Claude Code is running; it may rewrite ~/.claude.json or keep writing to the old session dir. Close it and rerun --fix-only --claude-only if anything was missed.'
+  fi
+
+  repair_claude_projects "$old_cwd" "$new_cwd"
+  repair_claude_history "$old_cwd" "$new_cwd"
+  repair_claude_config "$old_cwd" "$new_cwd"
+}
+
 while (($# > 0)); do
   case "$1" in
     --fix-only)
@@ -501,6 +722,10 @@ while (($# > 0)); do
       codex_only=1
       shift
       ;;
+    --claude-only)
+      claude_only=1
+      shift
+      ;;
     --pi-agent-dir)
       require_option_arg "$1" "${2-}"
       pi_agent_dir="$2"
@@ -509,6 +734,16 @@ while (($# > 0)); do
     --codex-home)
       require_option_arg "$1" "${2-}"
       codex_home="$2"
+      shift 2
+      ;;
+    --claude-home)
+      require_option_arg "$1" "${2-}"
+      claude_home="$2"
+      shift 2
+      ;;
+    --claude-config)
+      require_option_arg "$1" "${2-}"
+      claude_config="$2"
       shift 2
       ;;
     -h|--help)
@@ -530,8 +765,8 @@ while (($# > 0)); do
   esac
 done
 
-if (( pi_only && codex_only )); then
-  printf '%s\n' '--pi-only and --codex-only cannot be combined' >&2
+if (( pi_only + codex_only + claude_only > 1 )); then
+  printf '%s\n' '--pi-only, --codex-only and --claude-only cannot be combined' >&2
   exit 1
 fi
 
@@ -551,6 +786,8 @@ old_cwd="$(normalize_path "$1")"
 new_cwd="$(normalize_path "$2")"
 pi_agent_dir="$(normalize_path "$pi_agent_dir")"
 codex_home="$(normalize_path "$codex_home")"
+claude_home="$(normalize_path "$claude_home")"
+claude_config="$(normalize_path "$claude_config")"
 
 if [[ "$old_cwd" == "$new_cwd" ]]; then
   printf 'Old path and new path are identical after normalization\n' >&2
@@ -559,11 +796,11 @@ fi
 
 run_pi=1
 run_codex=1
-if (( codex_only )); then
-  run_pi=0
-fi
-if (( pi_only )); then
-  run_codex=0
+run_claude=1
+if (( pi_only || codex_only || claude_only )); then
+  run_pi=$pi_only
+  run_codex=$codex_only
+  run_claude=$claude_only
 fi
 
 if (( !fix_only )); then
@@ -578,6 +815,10 @@ if (( run_codex )); then
   repair_codex_sessions "$old_cwd" "$new_cwd"
 fi
 
+if (( run_claude )); then
+  repair_claude_sessions "$old_cwd" "$new_cwd"
+fi
+
 if (( dry_run )); then
   printf 'Summary (dry-run):\n'
   printf '  project move planned: %s\n' "$([[ $project_move_planned -eq 1 ]] && printf yes || printf no)"
@@ -585,6 +826,9 @@ if (( dry_run )); then
   printf '  pi session files to update: %s\n' "$pi_files_updated"
   printf '  codex rollout files to update: %s\n' "$codex_jsonl_updated"
   printf '  codex DB rows to update: %s\n' "$codex_db_rows_updated"
+  printf '  claude project dirs to move: %s\n' "$claude_dirs_moved"
+  printf '  claude files to update: %s\n' "$claude_files_updated"
+  printf '  claude config keys to rename: %s\n' "$claude_config_keys_updated"
 else
   printf 'Summary:\n'
   printf '  project moved: %s\n' "$([[ $project_moved -eq 1 ]] && printf yes || printf no)"
@@ -592,6 +836,9 @@ else
   printf '  pi session files updated: %s\n' "$pi_files_updated"
   printf '  codex rollout files updated: %s\n' "$codex_jsonl_updated"
   printf '  codex DB rows updated: %s\n' "$codex_db_rows_updated"
+  printf '  claude project dirs moved: %s\n' "$claude_dirs_moved"
+  printf '  claude files updated: %s\n' "$claude_files_updated"
+  printf '  claude config keys renamed: %s\n' "$claude_config_keys_updated"
 fi
 
 if ((${#warnings[@]} > 0)); then
