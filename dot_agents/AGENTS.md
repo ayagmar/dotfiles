@@ -3,7 +3,7 @@
 ## Execution Discipline
 - Execute requested changes instead of only describing intended next steps.
 - Do not end a turn with a plan when the requested implementation can be completed in the current turn.
-- Make the smallest correct change that satisfies the request.
+- Make the smallest change that solves the request correctly and maintainably. Smallest means least scope, not the fastest patch: when the quick fix and the maintainable fix differ, take the maintainable one, and if it needs materially broader changes than the request implies, say so and ask first.
 
 ## Preservation
 - Preserve unrelated files, configuration, data, behavior, and external state.
@@ -68,7 +68,6 @@ These apply when changing this machine's configuration (dotfiles, Niri, Noctalia
 - Remove dead code, unused params, unused fields, and stale comments.
 
 ## Change Strategy
-- Prefer the best maintainable solution that fits the task, not the fastest patch.
 - For upstream or dependency breaking changes, read the changelog, migration notes, and relevant types before editing.
 - Align local code with upstream concepts and exported types instead of duplicating API shapes or adding glue code.
 - Preserve useful upstream error detail unless there is a clear reason to translate or hide it.
@@ -79,7 +78,7 @@ These apply when changing this machine's configuration (dotfiles, Niri, Noctalia
 
 ## Dependencies
 - Before adding or upgrading dependencies, verify the latest stable compatible version from authoritative sources.
-- Record the version choice and compatibility rationale in working notes before commit.
+- State the version choice and compatibility rationale in your summary and in the commit message body.
 - Avoid unnecessary runtime dependencies and unexplained artifact-size growth.
 
 ## Documentation and Summaries
