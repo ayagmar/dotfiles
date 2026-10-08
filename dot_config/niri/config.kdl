@@ -197,6 +197,17 @@ window-rule {
     default-window-height { fixed 920; }
 }
 
+// niri-desktop-mcp test harness: a nested niri runs in a window with app-id "niri".
+// Float it in a corner without focus, so test runs don't move the tiled layout.
+window-rule {
+    match app-id="^niri$"
+    open-floating true
+    open-focused false
+    default-column-width { fixed 960; }
+    default-window-height { fixed 720; }
+    default-floating-position x=16 y=16 relative-to="bottom-right"
+}
+
 window-rule {
     match app-id=r#"^kitty$"#
     draw-border-with-background false
