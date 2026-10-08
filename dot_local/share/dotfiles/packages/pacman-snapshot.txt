@@ -68,10 +68,10 @@ playerctl
 power-profiles-daemon
 pre-commit
 qbittorrent
-qt5-declarative
 qt5ct
-qt6-websockets
+qt5-declarative
 qt6ct
+qt6-websockets
 reflector
 ripgrep
 rsync
