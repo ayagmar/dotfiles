@@ -146,8 +146,10 @@ show_elapsed_in_bar = true
 auto_paste = "off"
 
 [notification]
-keep_dismissed_in_history = false
-max_visible = 4
+keep_dismissed_in_history = true
+max_visible = 2
+width = 340
+show_actions = true
 
 [osd.kinds]
 media = false
