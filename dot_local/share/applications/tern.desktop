@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Tern
+Exec=/home/ayagmar/.local/opt/tern/tern
+Terminal=false
+Icon=utilities-terminal
+Categories=Utility;
