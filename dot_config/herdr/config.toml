@@ -1,0 +1,28 @@
+onboarding = false
+
+[theme]
+auto_switch = true
+dark_name = "catppuccin"
+light_name = "catppuccin-latte"
+
+[ui]
+agent_panel_sort = "priority"
+sidebar_width = 32
+sidebar_min_width = 28
+sidebar_max_width = 36
+status_indicators = "symbols"
+prompt_new_tab_name = false
+window_title = "{hostname}: {workspace} · herdr"
+
+[ui.sidebar.spaces]
+rows = [["state_icon", "workspace", "git_status"]]
+
+[ui.sidebar.agents]
+row_gap = 1
+rows = [
+  ["state_icon", "machine", "workspace"],
+  ["agent", "terminal_title_stripped"],
+]
+
+[ui.toast]
+delivery = "system"
