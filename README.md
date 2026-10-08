@@ -78,7 +78,7 @@ Personal Arch Linux dotfiles for `niri`, Noctalia, Kitty, zsh, and desktop autom
 - plaintext secrets
 - SSH keys
 - enabled-unit symlinks, except `gcr-ssh-agent.socket` so SSH keyring integration starts automatically
-- plugin source trees (OBS uses Noctalia's community source; Headroom uses a local development link)
+- plugin source trees (OBS and Headroom use Noctalia's community source)
 - OBS scene collections with PipeWire restore tokens
 - agent skills: own skills come from [ayagmar/agents-skills](https://github.com/ayagmar/agents-skills) and upstream ones from their own repos, all installed with `npx skills add ... -g` (see that repo's README)
 
@@ -215,8 +215,10 @@ Native v5 migration, bindings, theme propagation and package cleanup are documen
 in [the Niri setup notes](dot_config/niri/README.md). Application palettes and RGB
 follow Noctalia; GUI overrides remain app-owned in `~/.local/state/noctalia/`.
 
-Headroom is a separate development checkout at `~/projects/headroom`. Chezmoi
-preserves its local plugin symlink and enabled widget; restore that checkout
-separately on a new machine. Its code, cached usage and CLI sign-in files are not
-copied into this repository. Current Noctalia GUI preferences have been captured
-as defaults in `config.toml`; future GUI overrides remain app-owned.
+Headroom (`ayagmar/headroom`) is enabled from Noctalia's community plugin source.
+Chezmoi preserves its enabled plugin and bar widget in `config.toml`; Noctalia
+fetches and updates its runtime files. No local plugin symlink or development
+checkout is required. The optional checkout at `~/projects/headroom` remains
+separate. Plugin code, cached usage and CLI sign-in files are not copied into
+this repository. Current Noctalia GUI preferences have been captured as defaults
+in `config.toml`; future GUI overrides remain app-owned.
