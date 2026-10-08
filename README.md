@@ -61,6 +61,7 @@ Personal Arch Linux dotfiles for `niri`, Noctalia, Kitty, zsh, and desktop autom
 - local scripts
 - user systemd units
 - user-session environment overrides
+- SSH client config and GNOME Keyring SSH agent integration
 - stable GTK and Qt theme-tool config
 - selected app settings and autostart entries
 - local desktop entry overrides
@@ -76,7 +77,7 @@ Personal Arch Linux dotfiles for `niri`, Noctalia, Kitty, zsh, and desktop autom
 - `node_modules`
 - plaintext secrets
 - SSH keys
-- enabled-unit symlinks
+- enabled-unit symlinks, except `gcr-ssh-agent.socket` so SSH keyring integration starts automatically
 - plugin source trees (OBS uses Noctalia's community source; Headroom uses a local development link)
 - OBS scene collections with PipeWire restore tokens
 - agent skills: own skills come from [ayagmar/agents-skills](https://github.com/ayagmar/agents-skills) and upstream ones from their own repos, all installed with `npx skills add ... -g` (see that repo's README)
@@ -95,8 +96,15 @@ Portable secrets should be stored with a supported secret workflow instead, e.g.
 ## Root-managed files
 
 - `etc/nftables.conf.tmpl` manages `/etc/nftables.conf`
+- `etc/pam.d/greetd` unlocks GNOME Keyring with the login password. The login keyring password must match the account password.
 - local machine values like `lan_subnet` live in `~/.config/chezmoi/chezmoi.toml` and are not tracked
 - apply root-managed files explicitly, e.g. `chezmoi -D / apply /etc/nftables.conf`
+
+`dot_config/environment.d/40-ssh-agent.conf` and the enabled
+`gcr-ssh-agent.socket` select GNOME Keyring's SSH agent for the desktop and
+interactive shells. The laptop host in `private_dot_ssh/private_config` also
+selects that agent explicitly for existing Herdr clients. SSH private keys and
+keyring secrets remain local and are not tracked.
 
 ## Workflow
 
