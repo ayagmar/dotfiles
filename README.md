@@ -66,6 +66,7 @@ Personal Arch Linux dotfiles for `niri`, Noctalia, Kitty, zsh, and desktop autom
 - local desktop entry overrides
 - package manifests and machine snapshots
 - small dependency manifests needed by local integrations
+- shared coding-agent instructions (`~/.agents/AGENTS.md`, linked as Claude Code's `CLAUDE.md` and Codex's and Pi's `AGENTS.md`), Claude Code subagents, Pi prompt templates and Pi settings (without the telemetry `deviceId`)
 
 ## What is intentionally not tracked
 
@@ -78,6 +79,7 @@ Personal Arch Linux dotfiles for `niri`, Noctalia, Kitty, zsh, and desktop autom
 - enabled-unit symlinks
 - plugin source trees (OBS uses Noctalia's community source; Headroom uses a local development link)
 - OBS scene collections with PipeWire restore tokens
+- agent skills: own skills come from [ayagmar/agents-skills](https://github.com/ayagmar/agents-skills) and upstream ones from their own repos, all installed with `npx skills add ... -g` (see that repo's README)
 
 Portable secrets should be stored with a supported secret workflow instead, e.g. `chezmoi add --encrypt ...` or a password-manager-backed template.
 
