@@ -1,0 +1,11 @@
+# Apps niri-computer-use agents may start with `launch`.
+
+[[preset]]
+name = "kitty"
+argv = ["kitty"]
+app_id = "kitty"
+
+[[preset]]
+name = "helium"
+argv = ["helium-browser"]
+app_id = "helium"
