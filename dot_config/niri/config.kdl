@@ -254,7 +254,7 @@ binds {
 
     // Suggested binds for running programs: terminal, app launcher, screen locker.
     Mod+Return hotkey-overlay-title="Open a Terminal: Kitty" { spawn "kitty"; }
-    Mod+B hotkey-overlay-title="Open Browser: Helium" { spawn "/home/ayagmar/.local/bin/helium-browser-detached"; }
+    Mod+B hotkey-overlay-title="Open Browser: Helium" { spawn-sh "\"$HOME/.config/niri/scripts/helium-focus-or-spawn\""; }
     // Noctalia v5 IPC actions.
     Alt+Tab hotkey-overlay-title="Switch Windows" { spawn "noctalia" "msg" "window-switcher" "hold"; }
     Mod+Space hotkey-overlay-title="Open Noctalia Launcher" { spawn "noctalia" "msg" "panel-toggle" "launcher"; }

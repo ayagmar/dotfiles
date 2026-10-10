@@ -6,6 +6,7 @@ This directory contains the local `niri` layer for the desktop session.
 
 - [`config.kdl`](/home/ayagmar/.config/niri/config.kdl): compositor config, keybinds, startup, window rules
 - [`scripts/noctaliactl`](/home/ayagmar/.config/niri/scripts/noctaliactl): small Noctalia start/restart helper; regular shell actions use direct `noctalia msg ...` binds
+- [`scripts/helium-focus-or-spawn`](/home/ayagmar/.config/niri/scripts/helium-focus-or-spawn): `Mod+B` helper that focuses the running Helium window; a bare Chromium launch would hand the request to the running browser and open another window
 - [`../noctalia/config.toml`](/home/ayagmar/.config/noctalia/config.toml): Noctalia hooks and built-in template selection
 - [`../noctalia/templates.toml`](/home/ayagmar/.config/noctalia/templates.toml): local Noctalia user-template manifest
 - [`../noctalia/templates/`](/home/ayagmar/.config/noctalia/templates): local templates for apps Noctalia does not ship built-ins for
