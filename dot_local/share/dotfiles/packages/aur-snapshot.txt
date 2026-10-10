@@ -1,7 +1,9 @@
 claude-desktop
+coolercontrold-bin
 helium-browser-bin
 jetbrains-toolbox
 nautilus-open-any-terminal
+nct6687d-dkms-git
 openrgb-git
 python-openrgb-git
 vesktop
