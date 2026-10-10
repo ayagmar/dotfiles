@@ -41,7 +41,8 @@ update() {
   # Supply-chain cooldown: only install versions at least N days old, so freshly
   # published (potentially compromised) releases have time to be caught/yanked.
   # Applied where the tool supports it (npm/pnpm/uv/mise); Arch repos, AUR,
-  # flatpak and snap have no native min-age knob and are left as-is.
+  # flatpak, snap, the self-updating agent CLIs, agent skills and Noctalia
+  # plugins have no native min-age knob and are left as-is.
   local min_age_days=${UPDATE_MIN_AGE_DAYS:-7}
   local min_age_minutes=$(( min_age_days * 1440 ))
   local min_age_before=''
@@ -97,7 +98,7 @@ update() {
 
   print -P '%F{cyan}==> Update plan%f'
   print "  Mode: $mode_label"
-  print "  Min release age: ${min_age_days}d (npm/pnpm/uv/mise; not Arch/AUR/flatpak/snap)"
+  print "  Min release age: ${min_age_days}d (npm/pnpm/uv/mise; not Arch/AUR/flatpak/snap/agent CLIs/skills/plugins)"
   print "  Arch repo pending: ${#repo_before[@]}"
   print "  AUR pending: ${#aur_before[@]}"
   print "  Flatpak pending: ${#flatpak_before[@]}"
@@ -331,6 +332,69 @@ update() {
     }
   fi
 
+  # Agent CLIs that install and update themselves outside the package managers
+  # above. Herdr is not listed: mise owns it. Claude Code's own auto-updater is
+  # off for the native install, so this is the only thing updating it.
+  local -a self_updating_tools=(
+    'claude update'
+    'codex update'
+    'agy update'
+    'pi update --all'
+  )
+  local tool_command=''
+  for tool_command in "${self_updating_tools[@]}"; do
+    command -v "${tool_command%% *}" >/dev/null 2>&1 || continue
+    print ''
+    print -P "%F{cyan}==> ${tool_command%% *}%f"
+    ${=tool_command} || {
+      failed_steps+=("${tool_command%% *}")
+      exit_code=1
+    }
+  done
+
+  if command -v npx >/dev/null 2>&1 && [[ -f "$HOME/.agents/.skill-lock.json" ]]; then
+    print ''
+    print -P '%F{cyan}==> Agent skills%f'
+    npx -y skills update -g || {
+      failed_steps+=('skills')
+      exit_code=1
+    }
+  fi
+
+  # Noctalia's plugin auto-update is off because plugins can run commands, so
+  # update its configured plugin sources here, deliberately.
+  if command -v noctalia >/dev/null 2>&1 && noctalia msg status >/dev/null 2>&1; then
+    print ''
+    print -P '%F{cyan}==> Noctalia plugins%f'
+    local plugin_source=''
+    for plugin_source in ${(f)"$(noctalia msg plugins source list 2>/dev/null | awk '{print $1}')"}; do
+      noctalia msg plugins update "$plugin_source" || {
+        failed_steps+=("noctalia plugins ($plugin_source)")
+        exit_code=1
+      }
+    done
+  fi
+
+  # Upgrades can change what niri and Noctalia accept. A niri config it rejects
+  # only shows up at the next login, where niri falls back to its built-in defaults.
+  if command -v niri >/dev/null 2>&1; then
+    print ''
+    print -P '%F{cyan}==> Validating niri config%f'
+    niri validate || {
+      failed_steps+=('niri config')
+      exit_code=1
+    }
+  fi
+
+  if command -v noctalia >/dev/null 2>&1; then
+    print ''
+    print -P '%F{cyan}==> Validating Noctalia config%f'
+    noctalia config validate || {
+      failed_steps+=('noctalia config')
+      exit_code=1
+    }
+  fi
+
   if command -v checkupdates >/dev/null 2>&1; then
     repo_after=("${(@f)$(checkupdates 2>/dev/null || true)}")
     repo_after=("${(@)repo_after:#}")
@@ -380,6 +444,10 @@ update() {
     repo_updated_lines+=("$line")
     case "$package_name" in
       linux|linux-lts|linux-zen|linux-hardened|linux-firmware|systemd|systemd-libs|glibc)
+        reboot_packages+=("$package_name")
+        ;;
+      # The loaded NVIDIA kernel module must match the installed userspace driver.
+      nvidia|nvidia-lts|nvidia-dkms|nvidia-open|nvidia-open-lts|nvidia-open-dkms|nvidia-utils)
         reboot_packages+=("$package_name")
         ;;
     esac
@@ -474,6 +542,20 @@ update() {
     print ''
     print -P '%F{yellow}Still pending: Flatpak%f'
     for line in "${flatpak_after[@]}"; do
+      print "  - $line"
+    done
+  fi
+
+  local -a pacnew_files
+  if command -v pacdiff >/dev/null 2>&1; then
+    pacnew_files=("${(@f)$(pacdiff --output 2>/dev/null || true)}")
+    pacnew_files=("${(@)pacnew_files:#}")
+  fi
+
+  if (( ${#pacnew_files[@]} )); then
+    print ''
+    print -P '%F{yellow}Config files to merge (sudo pacdiff):%f'
+    for line in "${pacnew_files[@]}"; do
       print "  - $line"
     done
   fi
