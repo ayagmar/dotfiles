@@ -19,7 +19,13 @@
 ## Tests and Host Isolation
 - Tests must not read or mutate real user or host state; isolate filesystem, environment, network, process, and time dependencies.
 - Unit tests use controlled fakes. Tests requiring real external resources must be explicitly identified as integration tests and use disposable resources.
-- Test observable behavior and meaningful failure modes, not implementation details or impossible scenarios.
+- Tests encode domain behavior: the rules, invariants, contracts, and failure modes a user or caller relies on, named in domain terms. A test should fail only when that behavior breaks and survive refactors.
+- Derive tests from the stated requirements or spec, not from the code just written. Tests copied from your own implementation only confirm your own interpretation.
+- Before adding a test, name the realistic bug it would catch. If you cannot, do not write it. Fewer strong tests beat many weak ones; coverage percentage is not a goal.
+- Do not write tests that mirror the implementation: getters, setters, derives or generated code, framework or library behavior, mocks asserting they received what the test passed, snapshots of internal structures, one test per private helper, or near-duplicate cases exercising the same path.
+- Prefer tests through public interfaces (CLI, API, UI, module boundary), then property or invariant tests, then focused unit tests for pure domain logic. Mock only at real boundaries such as network, clock, OS, and external services.
+- When a change makes an existing test that only mirrors implementation obsolete, remove it instead of updating it.
+- Test impossible scenarios only when the guard protects a real input or state boundary.
 - For bug fixes, add or update a regression test when practical and keep it close to the changed behavior.
 - Test defaults and common paths, not only edge cases.
 
