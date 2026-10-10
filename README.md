@@ -168,7 +168,7 @@ git -C ~/.local/share/chezmoi status
 Bootstrap on another machine:
 
 ```bash
-sudo pacman -S chezmoi git
+sudo pacman -S chezmoi git uv  # uv: the first apply provisions OBS Control's Python env
 chezmoi init --apply ayagmar/dotfiles
 ~/.local/bin/dotfiles-bootstrap
 ```

@@ -128,4 +128,4 @@ sudo pacman -R noctalia-shell noctalia-qs spicetify-cli
 
 Use `-R` to preserve dependencies still used by the desktop. Spicetify now comes
 from mise's supported GitHub backend; `latest` respects the configured release-age
-policy. Backups from this migration are under `~/.local/share/noctalia-backups/`.
+policy.
