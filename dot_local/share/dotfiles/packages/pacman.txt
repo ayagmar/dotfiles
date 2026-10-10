@@ -66,4 +66,3 @@ vulkan-icd-loader
 
 # Wayland workflow tools
 wl-clipboard
-brightnessctl
