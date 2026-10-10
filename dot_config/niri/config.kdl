@@ -525,6 +525,11 @@ binds {
     // which ensures niri always processes them, even when an inhibitor is active.
     Mod+Escape allow-inhibiting=false { toggle-keyboard-shortcuts-inhibit; }
 
+    // Stops an AI agent driving the desktop through niri-computer-use: sets its stop
+    // flag, which takes the agent's lease and refuses new ones until
+    // `niri-computer-use resume`. Works under shortcut inhibitors and on the lock screen.
+    Mod+Shift+Escape allow-inhibiting=false allow-when-locked=true hotkey-overlay-title="Stop the AI Agent (niri-computer-use)" { spawn "/home/ayagmar/.cargo/bin/niri-computer-use" "stop"; }
+
     // The quit action will show a confirmation dialog to avoid accidental exits.
     Mod+Shift+E { quit; }
     Ctrl+Alt+Delete { quit; }
