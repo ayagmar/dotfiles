@@ -16,7 +16,3 @@ fi
 for file in "$HOME/.config/zsh"/*.zsh(.N); do
   source "$file"
 done
-
-
-# Added by Antigravity CLI installer
-export PATH="/home/ayagmar/.local/bin:$PATH"
