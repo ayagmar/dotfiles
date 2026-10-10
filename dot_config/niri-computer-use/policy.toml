@@ -1,11 +1,4 @@
-# Apps niri-computer-use agents may start with `launch`.
-
-[[preset]]
-name = "kitty"
-argv = ["kitty"]
-app_id = "kitty"
-
-[[preset]]
-name = "helium"
-argv = ["helium-browser"]
-app_id = "helium"
+# niri-computer-use policy. Agents may run any niri action (Spawn included), the
+# noctalia passthrough, and presets with arguments; still under the lease, the stop
+# key and the audit log.
+unrestricted = true
