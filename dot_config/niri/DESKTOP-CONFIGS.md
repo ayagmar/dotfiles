@@ -1,7 +1,7 @@
 # Desktop Config Map
 
-Chezmoi owns declarative configuration. Noctalia owns GUI overrides, runtime state
-and generated application palettes.
+Chezmoi owns declarative configuration and Noctalia's GUI overrides. Noctalia owns
+runtime state and generated application palettes.
 
 ## Managed configuration
 
@@ -12,6 +12,8 @@ and generated application palettes.
 | `~/.config/noctalia/templates.toml` | Built-in, community and local theme templates |
 | `~/.config/noctalia/templates/` | Local palette template inputs |
 | `~/.config/noctalia/scripts/apply-openrgb-theme.py` | Serialized RGB accent synchronization |
+| `~/.local/state/noctalia/settings.toml` | Noctalia GUI overrides, re-added by `dotfiles-sync` |
+| `~/.config/btop/btop.conf` | btop preferences, including the Noctalia theme selection |
 | `~/.config/kitty/kitty.conf` | Terminal preferences and generated-theme include |
 | `~/.config/gtk-{3,4}.0/settings.ini` | Icons and cursor preferences |
 | `~/.config/qt{5,6}ct/qt{5,6}ct.conf` | Qt application palette selection |
@@ -22,7 +24,7 @@ and generated application palettes.
 | `~/.config/obs-studio/` | Stable profile, global and user settings; encrypted WebSocket config |
 | `~/.config/environment.d/` | Session environment |
 | `~/.config/xdg-desktop-portal/` | Niri portal choices |
-| `~/.config/systemd/user/` | OpenRGB SDK and other user services |
+| `~/.config/systemd/user/` | OpenRGB SDK service and the GNOME portal renderer override |
 | `~/.local/share/applications/` | Application-native launcher overrides |
 
 OBS scene collections contain machine-specific PipeWire restore tokens and remain
@@ -30,7 +32,7 @@ untracked. Discord screenshot credentials stay encrypted or local-only.
 
 ## Native Noctalia state
 
-- `~/.local/state/noctalia/settings.toml`: GUI overrides; preserve these when restoring.
+- `~/.local/state/noctalia/settings.toml`: GUI overrides; tracked by chezmoi (see above).
 - `~/.local/state/noctalia/state.toml`: app-owned runtime state.
 - `~/.local/state/noctalia/plugins/`: git-source caches and the materialized OBS
   Control, Headroom and JetBrains plugins from Noctalia's community source. Updates

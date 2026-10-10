@@ -12,6 +12,7 @@ This directory contains the local `niri` layer for the desktop session.
 - [`../noctalia/templates/`](/home/ayagmar/.config/noctalia/templates): local templates for apps Noctalia does not ship built-ins for
 - [`../noctalia/scripts/apply-openrgb-theme.py`](/home/ayagmar/.config/noctalia/scripts/apply-openrgb-theme.py): applies RGB theme through the OpenRGB SDK via Python
 - [`../systemd/user/openrgb-server.service`](/home/ayagmar/.config/systemd/user/openrgb-server.service): keeps the OpenRGB SDK server tied to the niri session
+- [`../systemd/user/xdg-desktop-portal-gnome.service.d/renderer.conf`](/home/ayagmar/.config/systemd/user/xdg-desktop-portal-gnome.service.d/renderer.conf): runs the GNOME portal on GTK's OpenGL renderer; its Vulkan renderer failed on this NVIDIA GPU
 
 ## Startup Flow
 
@@ -66,8 +67,10 @@ Noctalia owns theme rendering:
 The official Arch `noctalia` package runs the native v5 shell. Managed preferences
 live in `~/.config/noctalia/config.toml`, which includes `templates.toml`.
 GUI overrides live in `~/.local/state/noctalia/settings.toml` and take precedence.
-App-owned state and rendered palettes are deliberately left out of chezmoi source.
-Legacy v4 JSON settings and QML plugins have been backed up and removed.
+Chezmoi tracks that file too, so `dotfiles-sync` captures GUI changes like any other
+managed file. Runtime state (`state.toml`, clipboard history, plugin caches) and
+rendered palettes stay out of chezmoi source. Legacy v4 JSON settings and QML
+plugins have been removed.
 
 `Mod+D` switches light/dark mode; choose another palette in Noctalia settings.
 The same palette feeds Niri, Kitty, GTK, Qt, btop, VS Code, Vesktop, Yazi,

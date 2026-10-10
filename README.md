@@ -63,6 +63,7 @@ Personal Arch Linux dotfiles for `niri`, Noctalia, Kitty, zsh, and desktop autom
 - user-session environment overrides
 - SSH client config and GNOME Keyring SSH agent integration
 - stable GTK and Qt theme-tool config
+- Noctalia GUI overrides (`~/.local/state/noctalia/settings.toml`)
 - selected app settings and autostart entries
 - local desktop entry overrides
 - package manifests and machine snapshots
@@ -213,7 +214,8 @@ These files are generated at runtime or from tracked source config and should no
 
 Native v5 migration, bindings, theme propagation and package cleanup are documented
 in [the Niri setup notes](dot_config/niri/README.md). Application palettes and RGB
-follow Noctalia; GUI overrides remain app-owned in `~/.local/state/noctalia/`.
+follow Noctalia. GUI overrides in `~/.local/state/noctalia/settings.toml` are tracked
+and re-added by `dotfiles-sync`; the rest of `~/.local/state/noctalia/` stays app-owned.
 
 Headroom (`ayagmar/headroom`) is enabled from Noctalia's community plugin source.
 Chezmoi preserves its enabled plugin and bar widget in `config.toml`; Noctalia
@@ -221,5 +223,5 @@ fetches its runtime files; plugin updates are manual and run through the zsh `up
 command. No local plugin symlink or development
 checkout is required. The optional checkout at `~/projects/headroom` remains
 separate. Plugin code, cached usage and CLI sign-in files are not copied into
-this repository. Current Noctalia GUI preferences have been captured as defaults
-in `config.toml`; future GUI overrides remain app-owned.
+this repository. `config.toml` is the curated base; GUI changes land in
+`settings.toml`, which wins over it and is tracked as described above.
