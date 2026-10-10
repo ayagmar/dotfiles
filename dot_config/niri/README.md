@@ -12,7 +12,6 @@ This directory contains the local `niri` layer for the desktop session.
 - [`../noctalia/templates/`](/home/ayagmar/.config/noctalia/templates): local templates for apps Noctalia does not ship built-ins for
 - [`../noctalia/scripts/apply-openrgb-theme.py`](/home/ayagmar/.config/noctalia/scripts/apply-openrgb-theme.py): applies RGB theme through the OpenRGB SDK via Python
 - [`../systemd/user/openrgb-server.service`](/home/ayagmar/.config/systemd/user/openrgb-server.service): keeps the OpenRGB SDK server tied to the niri session
-- [`../systemd/user/waytrim-watch@.service`](/home/ayagmar/.config/systemd/user/waytrim-watch@.service): optional manual Waytrim watcher modes for the Niri binds
 
 ## Startup Flow
 
@@ -24,7 +23,6 @@ Other startup ownership stays upstream-owned:
 
 - the polkit agent comes from Noctalia v5's native polkit agent
 - the OpenRGB SDK server comes from a user systemd service bound to `niri.service`
-- the Waytrim watcher is available through manual Niri binds and is not enabled by default
 - Noctalia renders themes through its built-in template pipeline
 
 ## Theme Flow

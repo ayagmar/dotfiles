@@ -185,7 +185,7 @@ Notes:
 - `dot_local/share/dotfiles/packages/pacman.txt` and `aur.txt` are curated portable baselines.
 - `dot_local/share/dotfiles/packages/*-snapshot.txt` are exact exports from this machine for reference.
 - log into Niri through the packaged Wayland session (`niri.desktop` -> `niri-session`), not a shell `exec niri --session` hack in `~/.zprofile`.
-- `niri` starts native v5 `noctalia` directly via `spawn-at-startup`; the Waytrim watcher is available through manual Niri binds but is not enabled by default, and Noctalia's built-in template pipeline owns theme rendering while the `colors_changed` hook reapplies OpenRGB after colors/templates are ready through one serialized SDK client run.
+- `niri` starts native v5 `noctalia` directly via `spawn-at-startup`, and Noctalia's built-in template pipeline owns theme rendering while the `colors_changed` hook reapplies OpenRGB after colors/templates are ready through one serialized SDK client run.
 - validate `niri` against the live target path `~/.config/niri/config.kdl`, not the raw `chezmoi` source copy, because the live config includes generated `noctalia.kdl` files that are intentionally not tracked.
 - RGB theme sync currently manages the GPU, keyboard, and motherboard headers through the OpenRGB SDK. Corsair RAM is not synced until OpenRGB exposes it on this machine.
 - `~/.config/xdg-desktop-portal/niri-portals.conf` is intentionally tracked on this machine.

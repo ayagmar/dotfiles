@@ -265,11 +265,6 @@ binds {
     Mod+E hotkey-overlay-title="Open Noctalia Emoji Picker" { spawn "noctalia" "msg" "panel-toggle" "launcher" "/emo"; }
     Mod+Alt+C hotkey-overlay-title="Open Noctalia Settings" { spawn "noctalia" "msg" "settings-toggle"; }
     Mod+Alt+N hotkey-overlay-title="Restart Noctalia Shell" { spawn-sh "\"$HOME/.config/niri/scripts/noctaliactl\" restart-shell"; }
-    Mod+Alt+V hotkey-overlay-title="Repair Clipboard with Waytrim" { spawn "waytrim" "prose" "--clipboard"; }
-    Mod+Alt+R hotkey-overlay-title="Restore Original Clipboard Text" { spawn-sh "\"$HOME/.config/niri/scripts/waytrim-restore-clipboard\""; }
-    Mod+Alt+A hotkey-overlay-title="Set Waytrim Watcher to Auto" { spawn-sh "\"$HOME/.config/niri/scripts/waytrim-watch-mode\" auto"; }
-    Mod+Alt+P hotkey-overlay-title="Set Waytrim Watcher to Prose" { spawn-sh "\"$HOME/.config/niri/scripts/waytrim-watch-mode\" prose"; }
-    Mod+Alt+X hotkey-overlay-title="Stop Waytrim Watcher" { spawn-sh "\"$HOME/.config/niri/scripts/waytrim-watch-mode\" stop"; }
     Mod+Shift+W hotkey-overlay-title="Open Noctalia Wallpaper Selector" { spawn "noctalia" "msg" "panel-toggle" "wallpaper"; }
     Mod+Ctrl+W hotkey-overlay-title="Open Wallpaper Automation Settings" { spawn "noctalia" "msg" "settings-open" "wallpaper"; }
     Mod+D hotkey-overlay-title="Toggle Noctalia Dark Mode" { spawn "noctalia" "msg" "theme-mode-toggle"; }

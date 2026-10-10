@@ -11,3 +11,11 @@
 
 # Spotify now uses the palette-only Noctalia theme.
 .config/spicetify/Themes/Comfy
+
+# Waytrim is no longer used.
+.config/systemd/user/waytrim-watch.service
+.config/systemd/user/waytrim-watch@.service
+.local/bin/waytrim
+.local/bin/waytrimctl
+.local/bin/waytrimd
+.local/bin/waytrim-watch
