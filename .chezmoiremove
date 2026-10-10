@@ -19,3 +19,6 @@
 .local/bin/waytrimctl
 .local/bin/waytrimd
 .local/bin/waytrim-watch
+
+# Vesktop's packaged desktop entry selects Wayland on its own (Electron 38+).
+.local/share/applications/vesktop.desktop
