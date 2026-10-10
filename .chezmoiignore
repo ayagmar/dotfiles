@@ -1,3 +1,5 @@
 README.md
 tests
 tests/**
+.config/noctalia/scripts/__pycache__
+.config/noctalia/scripts/__pycache__/**
