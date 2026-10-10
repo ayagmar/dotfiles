@@ -217,7 +217,8 @@ follow Noctalia; GUI overrides remain app-owned in `~/.local/state/noctalia/`.
 
 Headroom (`ayagmar/headroom`) is enabled from Noctalia's community plugin source.
 Chezmoi preserves its enabled plugin and bar widget in `config.toml`; Noctalia
-fetches and updates its runtime files. No local plugin symlink or development
+fetches its runtime files; plugin updates are manual and run through the zsh `update`
+command. No local plugin symlink or development
 checkout is required. The optional checkout at `~/projects/headroom` remains
 separate. Plugin code, cached usage and CLI sign-in files are not copied into
 this repository. Current Noctalia GUI preferences have been captured as defaults

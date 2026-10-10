@@ -97,7 +97,9 @@ bind replaces that old action. The native JetBrains provider is enabled with
 `jb` as its prefix and also participates in global search. Clipboard, idle lock,
 polkit and notifications use Noctalia's native services.
 
-OBS Control is installed and updated by Noctalia from its community source.
+OBS Control is installed by Noctalia from its community source. Plugin auto-update
+is off (`auto_update = "none"`) because plugins can run commands; the zsh `update`
+command refreshes the plugin sources when you choose to update.
 The temporary chezmoi archive override has been removed after the upstream merge.
 The configured `[plugins].enabled` entry activates it on restore; you can also run
 `noctalia msg plugins enable ayagmar/obs-control` while Noctalia is running.

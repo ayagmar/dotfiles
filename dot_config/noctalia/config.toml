@@ -108,7 +108,9 @@ type = "ayagmar/obs-control:status"
 
 [plugins]
 enabled = [ "ayagmar/obs-control", "cleboost/jetbrains-provider", "ayagmar/headroom" ]
-auto_update = "all"
+# Plugins can run commands, so update them deliberately through `update`
+# (`noctalia msg plugins update <source>`) instead of every six hours.
+auto_update = "none"
 
     [[plugins.source]]
     kind = "git"
