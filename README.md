@@ -133,13 +133,13 @@ chezmoi add --encrypt ~/.config/some/secret-file
 For project directories that have Pi or Codex session history, use the rename helper instead of a plain `mv`:
 
 ```bash
-project-rename ~/Projects/old-name ~/Projects/new-name
+project-rename ~/projects/old-name ~/projects/new-name
 ```
 
 If you already renamed the directory manually, repair the session metadata in place:
 
 ```bash
-project-rename --fix-only ~/Projects/old-name ~/Projects/new-name
+project-rename --fix-only ~/projects/old-name ~/projects/new-name
 ```
 
 Review and push:
