@@ -1,2 +1,3 @@
-@earendil-works/pi-coding-agent
-llm-usage-metrics
+cf@0.15.0
+llm-usage-metrics@0.10.2
+wrangler@4.149.0
