@@ -1,0 +1,4 @@
+[user]
+	name = Abdeslam Agmar
+	email = aagmar@theodo.com
+	signingkey = /home/ayagmar/.ssh/id_ed25519_orange.pub

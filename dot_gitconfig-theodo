@@ -1,0 +1,11 @@
+[user]
+	name = Abdeslam Yassine Agmar
+	email = abdeslam-yassine.agmar@theodo.com
+	signingkey = /home/ayagmar/.ssh/id_ed25519_theodo.pub
+[credential "https://github.com"]
+	username = abdeslam-agmar-nw
+	helper =
+	helper = !GH_CONFIG_DIR=/home/ayagmar/.config/gh-theodo /usr/bin/gh auth git-credential
+[url "git@github-theodo:"]
+	insteadOf = git@github.com:
+	insteadOf = ssh://git@github.com/

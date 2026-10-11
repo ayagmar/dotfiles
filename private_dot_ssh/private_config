@@ -4,9 +4,21 @@ Host github.com
     IdentityFile ~/.ssh/id_github_ayagmar
     IdentitiesOnly yes
 
+Host github-theodo
+    HostName github.com
+    User git
+    IdentityFile ~/.ssh/id_ed25519_theodo
+    IdentitiesOnly yes
+
 Host laptop 192.168.1.20
     HostName 192.168.1.20
     User ayagmar
     IdentityFile ~/.ssh/id_laptop
     IdentityAgent /run/user/%i/gcr/ssh
+    IdentitiesOnly yes
+
+Host gitlab-df-main.gos.orange.com
+    HostName gitlab-df-main.gos.orange.com
+    User git
+    IdentityFile ~/.ssh/id_ed25519_orange
     IdentitiesOnly yes

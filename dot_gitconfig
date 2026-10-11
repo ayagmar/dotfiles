@@ -18,7 +18,17 @@
 [credential "https://gist.github.com"]
 	helper = 
 	helper = !/usr/bin/gh auth git-credential
+[credential "https://gitlab-df-main.gos.orange.com"]
+	username = aagmar
+	helper = libsecret
+[credential "https://abdeslam-agmar-nw@github.com"]
+	helper =
+	helper = !GH_CONFIG_DIR=/home/ayagmar/.config/gh-theodo /usr/bin/gh auth git-credential
 [push]
 	autoSetupRemote = true
 [alias]
 	sync-fork = !git switch main && git fetch upstream && git merge --ff-only upstream/main && git push origin main
+[includeIf "gitdir:~/projects/orange/"]
+	path = ~/.gitconfig-orange
+[includeIf "gitdir:~/projects/theodo/"]
+	path = ~/.gitconfig-theodo

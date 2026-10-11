@@ -143,6 +143,21 @@ keyring secrets remain local and are not tracked.
 
 ## Workflow
 
+Git commit identities are selected by repository directory: the personal identity
+is the default, `~/projects/orange/` uses the Orange identity, and
+`~/projects/theodo/` uses the Theodo identity. Theodo SSH remotes use the
+`github-theodo` host alias and the local `~/.ssh/id_ed25519_theodo` key.
+
+Interactive zsh commands select the separate `~/.config/gh-theodo` GitHub CLI
+configuration when run in `~/projects/theodo/` or a subdirectory. Elsewhere,
+`gh` uses its normal personal configuration. Log in to the work account once
+from that directory with `gh auth login --hostname github.com --web
+--git-protocol ssh --skip-ssh-key`. Scripts that do not load the zsh function
+can select the work configuration explicitly with
+`GH_CONFIG_DIR="$HOME/.config/gh-theodo" gh ...`. Explicit `GH_TOKEN` or
+`GITHUB_TOKEN` environment variables override stored CLI credentials. GitHub
+CLI login files and tokens are not tracked in chezmoi.
+
 Edit your real files in `$HOME`.
 
 For existing managed files, use the sync helper:
