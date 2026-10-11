@@ -44,6 +44,11 @@ update() {
   # flatpak, snap, the self-updating agent CLIs, agent skills and Noctalia
   # plugins have no native min-age knob and are left as-is.
   local min_age_days=${UPDATE_MIN_AGE_DAYS:-7}
+  # npm package names/globs trusted to bypass the cooldown. Dependencies still
+  # follow the age policy unless they also match this allowlist.
+  local -a npm_cooldown_allowlist=(
+    llm-usage-metrics
+  )
   local min_age_minutes=$(( min_age_days * 1440 ))
   local min_age_before=''
   min_age_before=$(date -u -d "${min_age_days} days ago" +%Y-%m-%dT%H:%M:%SZ 2>/dev/null \
@@ -76,9 +81,39 @@ update() {
     flatpak_before=("${(@)flatpak_before:#}")
   fi
 
+  local npm_snapshot=''
+  local npm_snapshot_script='
+    let input = "";
+    process.stdin.setEncoding("utf8");
+    process.stdin.on("data", chunk => input += chunk);
+    process.stdin.on("end", () => {
+      try {
+        const { dependencies = {} } = JSON.parse(input);
+        for (const [name, pkg] of Object.entries(dependencies)) {
+          if (name === "npm" || name === "corepack") continue;
+          if (typeof pkg.version !== "string" || !pkg.version) {
+            throw new Error(`Cannot preserve the installed version of ${name}`);
+          }
+          console.log(`${name}@${pkg.version}`);
+        }
+      } catch (error) {
+        console.error(error.message);
+        process.exitCode = 1;
+      }
+    });
+  '
   if command -v npm >/dev/null 2>&1; then
-    npm_globals=("${(@f)$(npm ls -g --depth=0 --parseable=true 2>/dev/null | sed '1d;s|.*node_modules/||' | grep -vE '^(npm|corepack)$' || true)}")
+    if ! npm_snapshot=$(npm ls -g --depth=0 --json | node -e "$npm_snapshot_script"); then
+      print -u2 'Cannot safely snapshot npm globals; no updates started.'
+      return 1
+    fi
+    npm_globals=("${(@f)npm_snapshot}")
     npm_globals=("${(@)npm_globals:#}")
+    if (( ${#npm_globals[@]} )); then
+      # mise may replace Node below. Restore the versions already installed,
+      # not whatever an unversioned package name resolves to at that moment.
+      print -l -- "${npm_globals[@]}" > ~/.default-npm-packages || return 1
+    fi
   fi
 
   if command -v pnpm >/dev/null 2>&1; then
@@ -103,6 +138,7 @@ update() {
   print "  AUR pending: ${#aur_before[@]}"
   print "  Flatpak pending: ${#flatpak_before[@]}"
   print "  npm globals installed: ${#npm_globals[@]}"
+  print "  npm cooldown allowlist: ${(j:, :)npm_cooldown_allowlist}"
   print "  pnpm globals installed: ${#pnpm_globals[@]}"
   print "  uv tools installed: $uv_tool_count"
   if (( stale_download_count )); then
@@ -301,17 +337,51 @@ update() {
   if (( ${#npm_globals[@]} )); then
     print ''
     print -P '%F{cyan}==> Global npm packages%f'
-    # mise installs each node version into its own prefix, so `npm update -g`
-    # does nothing after a node upgrade wipes globals. Reinstall the captured
-    # list (installs latest = restore + update), keep mise's default-packages
-    # file in sync so future node installs self-heal, then reshim.
-    print -l -- "${npm_globals[@]}" > ~/.default-npm-packages
-    if npm install -g --min-release-age "$min_age_days" "${npm_globals[@]}"; then
-      command -v mise > /dev/null 2>&1 && mise reshim 2>/dev/null
+    local npm_result='' npm_error_code='' package_spec='' package_version=''
+    for package_spec in "${npm_globals[@]}"; do
+      package_name=${package_spec%@*}
+      package_version=${package_spec##*@}
+      # A lower bound prevents cooldowns (or a rolled-back latest tag) from
+      # replacing a manually installed newer version with an older release.
+      if npm_result=$(npm install -g --json --min-release-age "$min_age_days" \
+        --min-release-age-exclude "${(j:,:)npm_cooldown_allowlist}" \
+        "${package_name}@>=${package_version}"); then
+        print "  Checked $package_name."
+      else
+        npm_error_code=$(print -r -- "$npm_result" | node -e '
+          let input = "";
+          process.stdin.setEncoding("utf8");
+          process.stdin.on("data", chunk => input += chunk);
+          process.stdin.on("end", () => {
+            try { console.log(JSON.parse(input).error?.code ?? ""); }
+            catch { /* Preserve unstructured diagnostics in the failure branch. */ }
+          });
+        ')
+        case "$npm_error_code" in
+          ETARGET|ENOVERSIONS)
+            print -P "%F{yellow}  Held $package_spec: no eligible version resolves; keeping the installed version.%f"
+            ;;
+          *)
+            print -u2 -r -- "$npm_result"
+            failed_steps+=("npm globals ($package_name)")
+            exit_code=1
+            ;;
+        esac
+      fi
+    done
+    # Keep future Node installs at the versions actually present after updates.
+    if npm_snapshot=$(npm ls -g --depth=0 --json | node -e "$npm_snapshot_script"); then
+      print '  Installed npm globals:'
+      print -r -- "$npm_snapshot"
+      print -r -- "$npm_snapshot" > ~/.default-npm-packages || {
+        failed_steps+=('npm restore list')
+        exit_code=1
+      }
     else
-      failed_steps+=('npm globals')
+      failed_steps+=('npm globals snapshot')
       exit_code=1
     fi
+    command -v mise > /dev/null 2>&1 && mise reshim 2>/dev/null
   fi
 
   if (( ${#pnpm_globals[@]} )); then

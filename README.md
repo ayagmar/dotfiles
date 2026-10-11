@@ -5,7 +5,8 @@ Personal Arch Linux dotfiles for `niri`, Noctalia, Kitty, zsh, and desktop autom
 ## Repo map
 
 - `dot_zshrc`
-- `dot_default-npm-packages` (mise Node global package restore list)
+- `dot_default-npm-packages` (mise Node global package restore list; `update`
+  refreshes the live list with exact installed versions)
 - `.chezmoiexternal.toml`
 - `.gitignore`
 - `.pre-commit-config.yaml`
@@ -93,6 +94,39 @@ Portable secrets should be stored with a supported secret workflow instead, e.g.
 - `dot_local/bin/executable_dotfiles-refresh-state`
 - `dot_local/bin/executable_dotfiles-sync`
 - `dot_local/bin/executable_project-rename`
+
+## Updates
+
+Run `update` in zsh, or `update --yes` for non-interactive updates. The release
+cooldown defaults to seven days and can be changed with `UPDATE_MIN_AGE_DAYS`.
+
+The npm cooldown allowlist lives in `npm_cooldown_allowlist` inside
+`dot_config/zsh/40-update.zsh`. It includes `llm-usage-metrics`, an owned package.
+Add npm package names or quoted globs such as `'@myorg/*'` there, then apply the
+managed file:
+
+```bash
+chezmoi apply ~/.config/zsh/40-update.zsh
+```
+
+Allowlisted packages bypass the cooldown; their dependencies still follow it
+unless also allowlisted. Other npm globals only install releases at least as new
+as the version present before the update. If no eligible version resolves, the
+installed version is kept rather than downgraded. Registry and installation errors
+other than an empty eligible resolution are still reported as failures.
+
+Before upgrading Node, `update` writes exact installed versions to
+`~/.default-npm-packages` so mise restores those versions into the new prefix.
+After npm updates, it refreshes that list with the versions actually installed.
+Reload `~/.config/zsh/40-update.zsh` or open a new shell after changing the updater.
+
+The updater regression tests require bubblewrap, zsh, and Node. They use fake
+package managers inside a filesystem and network sandbox instead of updating the
+host. Run them from this checkout:
+
+```bash
+python -m unittest discover -s tests -p 'test_update.py'
+```
 
 ## Root-managed files
 
