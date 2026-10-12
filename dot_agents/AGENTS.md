@@ -90,6 +90,7 @@ These apply when changing this machine's configuration (dotfiles, Niri, Noctalia
 ## Documentation and Summaries
 - After structural changes, update relevant user-facing docs such as `README` or `docs/`.
 - Keep docs aligned with runtime behavior and CLI or API semantics.
+- Use the `no-slop` skill whenever you write or edit prose people will read: READMEs, docs, landing pages and marketing copy, changelogs, release notes, PR descriptions, commit messages, and posts.
 - In reviews and summaries, list findings first by severity, then give a concise change summary.
 - Summarize by impact across the full change set, not by the latest files touched.
 
