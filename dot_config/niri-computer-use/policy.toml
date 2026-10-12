@@ -2,3 +2,6 @@
 # noctalia passthrough, and presets with arguments; still under the lease, the stop
 # key and the audit log.
 unrestricted = true
+
+# screenshot save_path writes here.
+capture_dir = "~/Pictures/agent"
