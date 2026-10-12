@@ -19,6 +19,12 @@ table inet filter {
   chain forward {
     type filter hook forward priority 0;
     policy drop;
+
+    # Docker containers may reach out; only their replies come back in.
+    iifname "docker0" accept
+    iifname "br-*" accept
+    oifname "docker0" ct state established,related accept
+    oifname "br-*" ct state established,related accept
   }
 
   chain output {
