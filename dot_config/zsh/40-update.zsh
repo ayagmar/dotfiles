@@ -49,6 +49,11 @@ update() {
   local -a npm_cooldown_allowlist=(
     llm-usage-metrics
   )
+  # AUR package names trusted to bypass the cooldown.
+  local -a aur_cooldown_allowlist=(
+    claude-desktop
+    helium-browser-bin
+  )
   local min_age_minutes=$(( min_age_days * 1440 ))
   local min_age_before=''
   min_age_before=$(date -u -d "${min_age_days} days ago" +%Y-%m-%dT%H:%M:%SZ 2>/dev/null \
@@ -139,6 +144,7 @@ update() {
   print "  Flatpak pending: ${#flatpak_before[@]}"
   print "  npm globals installed: ${#npm_globals[@]}"
   print "  npm cooldown allowlist: ${(j:, :)npm_cooldown_allowlist}"
+  print "  AUR cooldown allowlist: ${(j:, :)aur_cooldown_allowlist}"
   print "  pnpm globals installed: ${#pnpm_globals[@]}"
   print "  uv tools installed: $uv_tool_count"
   if (( stale_download_count )); then
@@ -154,7 +160,8 @@ update() {
     # AUR supply-chain cooldown: hold back AUR packages whose PKGBUILD was
     # updated within the last min_age_days (per AUR RPC LastModified), so a
     # freshly pushed (possibly compromised) PKGBUILD isn't built immediately.
-    # They get picked up automatically once they age past the threshold.
+    # They get picked up automatically once they age past the threshold, unless
+    # they are on aur_cooldown_allowlist.
     # Note: devel (-git etc.) packages track upstream commits, not LastModified,
     # so they are not gated here; official repo packages have no age knob.
     aur_fresh=()
@@ -170,6 +177,9 @@ update() {
         aur_fresh=("${(@f)$(curl -fsS --max-time 15 "https://aur.archlinux.org/rpc/v5/info?${_rpc#&}" 2>/dev/null \
           | jq -r --argjson cutoff "$_cutoff" '.results[] | select(.LastModified > $cutoff) | .Name' 2>/dev/null || true)}")
         aur_fresh=("${(@)aur_fresh:#}")
+        for _nm in "${aur_cooldown_allowlist[@]}"; do
+          aur_fresh=("${(@)aur_fresh:#$_nm}")
+        done
       fi
     fi
     if (( ${#aur_fresh[@]} )); then
