@@ -54,6 +54,11 @@ update() {
     claude-desktop
     helium-browser-bin
   )
+  # mise runtime names trusted to bypass the cooldown, so their updates land as
+  # soon as they are published instead of after min_age_days.
+  local -a mise_cooldown_allowlist=(
+    bun
+  )
   local min_age_minutes=$(( min_age_days * 1440 ))
   local min_age_before=''
   min_age_before=$(date -u -d "${min_age_days} days ago" +%Y-%m-%dT%H:%M:%SZ 2>/dev/null \
@@ -145,6 +150,7 @@ update() {
   print "  npm globals installed: ${#npm_globals[@]}"
   print "  npm cooldown allowlist: ${(j:, :)npm_cooldown_allowlist}"
   print "  AUR cooldown allowlist: ${(j:, :)aur_cooldown_allowlist}"
+  print "  mise cooldown allowlist: ${(j:, :)mise_cooldown_allowlist}"
   print "  pnpm globals installed: ${#pnpm_globals[@]}"
   print "  uv tools installed: $uv_tool_count"
   if (( stale_download_count )); then
@@ -331,6 +337,16 @@ update() {
 
     print ''
     print -P '%F{cyan}==> mise runtimes%f'
+    # Allowlisted runtimes skip the cooldown first; the gated pass below finds
+    # them already current and mise never downgrades. An empty "$flag[@]"
+    # expansion must not turn the gated pass into an ungated one, hence the
+    # explicit guard.
+    if (( min_age_days > 0 )) && (( ${#mise_cooldown_allowlist[@]} )); then
+      MISE_MINIMUM_RELEASE_AGE=0d mise upgrade -y "${mise_cooldown_allowlist[@]}" || {
+        failed_steps+=('mise upgrade (allowlist)')
+        exit_code=1
+      }
+    fi
     MISE_MINIMUM_RELEASE_AGE="${min_age_days}d" mise upgrade -y || {
       failed_steps+=('mise upgrade')
       exit_code=1
