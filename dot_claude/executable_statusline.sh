@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Claude Code status line, two rows:
 #   user@host project ⎇ branch · PR · spend across all agents
-#   model · effort │ context bar, % used, tokens │ prompt cache │ usage limit (or session cost)
+#   model · effort │ context bar, % used, tokens, compactions │ prompt cache │ usage limit (or session cost)
 # Reads the status JSON on stdin (https://code.claude.com/docs/en/statusline).
 
 input=$(cat)
@@ -137,6 +137,16 @@ if [[ -n $used ]]; then
   [[ -z $in_use && -n $size ]] && in_use=$(( size * used / 100 ))
   row2+="${sep}ctx ${color}${bar} ${used}%${reset}"
   [[ -n $in_use && -n $size ]] && row2+=" ${color}$(tokens "$in_use")${reset}${dim}/$(tokens "$size")${reset}"
+fi
+
+# Compactions so far, counted from the transcript's compact boundaries. Hidden until the first one.
+# grep narrows the lines and jq keeps only top-level boundaries, not quoted or nested copies.
+if [[ -n $transcript && -r $transcript ]]; then
+  compactions=$(grep -F '"subtype":"compact_boundary"' "$transcript" \
+    | jq -n '[inputs | select(.type == "system" and .subtype == "compact_boundary")] | length' 2>/dev/null)
+  if [[ -n $compactions ]] && (( compactions > 0 )); then
+    row2+="${dot}${dim}compacted ${compactions}×${reset}"
+  fi
 fi
 
 # Prompt cache: session hit rate and miss count, then time left while warm. Once cold: time since
