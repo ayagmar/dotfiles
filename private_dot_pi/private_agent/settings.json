@@ -1,12 +1,11 @@
 {
-  "lastChangelogVersion": "1.1.0",
+  "lastChangelogVersion": "1.2.0",
   "packages": [
     "npm:pi-promptsmith",
     "npm:pi-extmgr",
     "https://github.com/davebcn87/pi-autoresearch",
     "git:github.com/edxeth/pi-gpt-config",
     "git:github.com/ayagmar/pi-message-recall",
-    "git:git@github.com:leohenon/pi-anthropic-oauth.git",
     "git:git@github.com:ayagmar/pi-codex-web-search.git"
   ],
   "defaultProvider": "openai-codex-6",
