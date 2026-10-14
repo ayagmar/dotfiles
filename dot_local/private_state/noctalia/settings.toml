@@ -41,6 +41,7 @@ widget_order = [ "lockscreen-login-box@DP-1" ]
         show_weather = true
 
 [plugin_settings."ayagmar/headroom"]
+bar_accounts = "all"
 bar_style = "value"
 display = "remaining"
 provider_antigravity = "panel"
@@ -64,7 +65,7 @@ enabled = [ "cleboost/jetbrains-provider", "ayagmar/obs-control", "ayagmar/headr
     name = "community"
 
 [theme]
-builtin = "Eldritch"
+builtin = "Catppuccin"
 community_palette = "One"
 mode = "dark"
 source = "wallpaper"
@@ -81,3 +82,9 @@ path = "/home/ayagmar/Pictures/Wallpapers/Flower-2.png"
 
 [[wallpaper.favorite]]
 path = "/home/ayagmar/Pictures/Wallpapers/Manga-Shrine.png"
+
+[[wallpaper.favorite]]
+palette_source = "wallpaper"
+path = "/home/ayagmar/Pictures/Wallpapers/Flower-2.png"
+theme_mode = "dark"
+wallpaper_scheme = "m3-content"
