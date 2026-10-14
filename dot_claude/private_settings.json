@@ -5,7 +5,48 @@
     "pr": ""
   },
   "includeCoAuthoredBy": false,
+  "permissions": {
+    "deny": [
+      "Artifact",
+      "ArtifactComments",
+      "ArtifactData",
+      "SendFeedback",
+      "ListAgents"
+    ],
+    "defaultMode": "auto"
+  },
   "model": "opus",
+  "disableClaudeAiConnectors": true,
+  "skillOverrides": {
+    "anthropic-skills:docs": "off",
+    "anthropic-skills:docx": "off",
+    "anthropic-skills:pptx": "off",
+    "anthropic-skills:xlsx": "off",
+    "anthropic-skills:pdf": "off",
+    "anthropic-skills:google-workspace": "off",
+    "anthropic-skills:computer-use": "off",
+    "anthropic-skills:chrome-browser": "off",
+    "anthropic-skills:built-in-browser": "off",
+    "anthropic-skills:deep-research": "off",
+    "anthropic-skills:morning": "off",
+    "anthropic-skills:import-memory": "off",
+    "anthropic-skills:skill-creator": "name-only",
+    "artifact-design": "off",
+    "artifact-diagramming": "off",
+    "artifact-capabilities": "off",
+    "code-review": "user-invocable-only",
+    "loop": "user-invocable-only",
+    "schedule": "user-invocable-only",
+    "run": "user-invocable-only",
+    "init": "user-invocable-only",
+    "security-review": "user-invocable-only",
+    "keybindings-help": "user-invocable-only",
+    "fewer-permission-prompts": "user-invocable-only",
+    "workflow-authoring": "user-invocable-only",
+    "dataviz": "name-only",
+    "claude-api": "name-only",
+    "update-config": "name-only"
+  },
   "hooks": {
     "SessionStart": [
       {
@@ -44,6 +85,9 @@
     },
     "claude-sonnet-5-5": {
       "effortLevel": "low"
+    },
+    "claude-fable-5-1": {
+      "effortLevel": "medium"
     }
   },
   "pluginConfigs": {
@@ -56,46 +100,5 @@
     }
   },
   "skipDangerousModePermissionPrompt": true,
-  "theme": "dark-daltonized",
-  "disableClaudeAiConnectors": true,
-  "permissions": {
-    "defaultMode": "auto",
-    "deny": [
-      "Artifact",
-      "ArtifactComments",
-      "ArtifactData",
-      "SendFeedback",
-      "ListAgents"
-    ]
-  },
-  "skillOverrides": {
-    "anthropic-skills:docs": "off",
-    "anthropic-skills:docx": "off",
-    "anthropic-skills:pptx": "off",
-    "anthropic-skills:xlsx": "off",
-    "anthropic-skills:pdf": "off",
-    "anthropic-skills:google-workspace": "off",
-    "anthropic-skills:computer-use": "off",
-    "anthropic-skills:chrome-browser": "off",
-    "anthropic-skills:built-in-browser": "off",
-    "anthropic-skills:deep-research": "off",
-    "anthropic-skills:morning": "off",
-    "anthropic-skills:import-memory": "off",
-    "anthropic-skills:skill-creator": "name-only",
-    "artifact-design": "off",
-    "artifact-diagramming": "off",
-    "artifact-capabilities": "off",
-    "code-review": "user-invocable-only",
-    "loop": "user-invocable-only",
-    "schedule": "user-invocable-only",
-    "run": "user-invocable-only",
-    "init": "user-invocable-only",
-    "security-review": "user-invocable-only",
-    "keybindings-help": "user-invocable-only",
-    "fewer-permission-prompts": "user-invocable-only",
-    "workflow-authoring": "user-invocable-only",
-    "dataviz": "name-only",
-    "claude-api": "name-only",
-    "update-config": "name-only"
-  }
+  "theme": "dark-daltonized"
 }
