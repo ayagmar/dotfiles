@@ -172,6 +172,16 @@ animations {
     // slowdown 3.0
 }
 
+// Background blur for semitransparent surfaces. xray is on by default, so niri
+// blurs the wallpaper once and reuses it for every window.
+blur {
+    // Tight frost: the wallpaper stays recognizable behind panes.
+    passes 2
+    offset 3
+    // Keep the colors from washing out the text.
+    saturation 1.1
+}
+
 // Window rules let you adjust behavior for individual windows.
 // Find more information on the wiki:
 // https://niri-wm.github.io/niri/Configuration:-Window-Rules
@@ -208,6 +218,14 @@ window-rule {
     default-column-width { fixed 960; }
     default-window-height { fixed 720; }
     default-floating-position x=16 y=16 relative-to="bottom-right"
+}
+
+// Frost whatever shows through semitransparent windows (kitty/Herdr, Noctalia
+// panels and dialogs).
+window-rule {
+    background-effect {
+        blur true
+    }
 }
 
 window-rule {

@@ -23,7 +23,7 @@ speed = 1.5
 [bar.default]
 position = "top"
 auto_hide = false
-background_opacity = 0.9
+background_opacity = 0.82
 margin_ends = 18
 margin_edge = 12
 widget_spacing = 4
