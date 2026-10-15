@@ -62,7 +62,7 @@
 
 ## Delegating and Reviewing
 - When running inside herdr (`HERDR_ENV=1`), use it for parallel agents, panes, and independent review. Work per task in a git worktree.
-- Independent reviewers run without global steering so their input is raw: pi with `--no-context-files --no-skills --no-extensions --no-prompt-templates --no-mcp`, Claude Code with `--safe-mode`.
+- Independent reviewers run in pi without global steering so their input is raw: `--no-context-files --no-skills --no-extensions --no-prompt-templates --no-mcp`. For a Claude reviewer, use the same pi command through the `claude-bridge` provider, never `anthropic` or Claude Code: add `-e ~/.pi/agent/git/github.com/elidickinson/pi-claude-bridge --model claude-bridge/<model>`.
 - Before merging a PR you were asked to merge, run an adversarial review in its own pane unless told to skip it.
 - When briefing a delegated reviewer, require findings by severity with `file:line`, a concrete failure scenario, and the smallest fix; no style nits or padding; reply only with the report path. After fixes, send the same reviewer the new head to re-check.
 - A delegated brief is self-contained: read-only rules, repo and branch, exact files, output path, required format.
