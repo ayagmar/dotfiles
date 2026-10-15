@@ -1,8 +1,5 @@
 config_version = 14
 
-[control_center.calendar]
-show_events_card = false
-
 [lockscreen_widgets]
 enabled = false
 schema_version = 2
@@ -43,7 +40,6 @@ widget_order = [ "lockscreen-login-box@DP-1" ]
 [plugin_settings."ayagmar/headroom"]
 bar_accounts = "all"
 bar_style = "value"
-display = "remaining"
 provider_antigravity = "panel"
 refresh_minutes = 3
 window = "session"
@@ -65,26 +61,38 @@ enabled = [ "cleboost/jetbrains-provider", "ayagmar/obs-control", "ayagmar/headr
     name = "community"
 
 [theme]
-builtin = "Catppuccin"
-community_palette = "One"
+builtin = "Tokyo-Night"
+community_palette = "Monochrome"
 mode = "dark"
 source = "wallpaper"
 wallpaper_scheme = "m3-content"
 
 [wallpaper.default]
-path = "/home/ayagmar/Pictures/Wallpapers/Flower-2.png"
+path = "/home/ayagmar/Pictures/Wallpapers/Anime-Purple-eyes.png"
 
 [wallpaper.last]
-path = "/home/ayagmar/Pictures/Wallpapers/Flower-2.png"
+path = "/home/ayagmar/Pictures/Wallpapers/Anime-Purple-eyes.png"
 
 [wallpaper.monitors.DP-1]
-path = "/home/ayagmar/Pictures/Wallpapers/Flower-2.png"
+path = "/home/ayagmar/Pictures/Wallpapers/Anime-Purple-eyes.png"
 
 [[wallpaper.favorite]]
+palette_source = "wallpaper"
 path = "/home/ayagmar/Pictures/Wallpapers/Manga-Shrine.png"
+theme_mode = "dark"
+wallpaper_scheme = "m3-content"
 
 [[wallpaper.favorite]]
 palette_source = "wallpaper"
 path = "/home/ayagmar/Pictures/Wallpapers/Flower-2.png"
+theme_mode = "dark"
+wallpaper_scheme = "m3-content"
+
+[[wallpaper.favorite]]
+path = "/home/ayagmar/Pictures/Wallpapers/Anime-Purple-eyes.png"
+
+[[wallpaper.favorite]]
+palette_source = "wallpaper"
+path = "/home/ayagmar/Pictures/Wallpapers/ Knights-of-Sidonia.png"
 theme_mode = "dark"
 wallpaper_scheme = "m3-content"
