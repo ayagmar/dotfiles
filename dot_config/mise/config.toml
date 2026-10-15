@@ -11,3 +11,6 @@ node = "lts"
 pnpm = "latest"
 uv = "latest"
 "github:spicetify/cli" = "latest"
+
+[settings]
+minimum_release_age_excludes = ["herdr"]
