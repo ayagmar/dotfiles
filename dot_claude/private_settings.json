@@ -75,12 +75,18 @@
         "source": "github",
         "repo": "ayagmar/claude-mods"
       }
+    },
+    "navigator-marketplace": {
+      "source": {
+        "source": "github",
+        "repo": "qf-studio/navigator"
+      }
     }
   },
   "effortLevel": "high",
   "modelSettings": {
     "claude-opus-5-5": {
-      "effortLevel": "medium",
+      "effortLevel": "high",
       "autoCompactWindow": 400000
     },
     "claude-sonnet-5-5": {
@@ -95,7 +101,8 @@
       "options": {
         "updateCheckHours": 6,
         "detectRemote": true,
-        "debugTimings": false
+        "debugTimings": false,
+        "notifyUpdates": true
       }
     }
   },
