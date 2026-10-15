@@ -75,12 +75,6 @@
         "source": "github",
         "repo": "ayagmar/claude-mods"
       }
-    },
-    "navigator-marketplace": {
-      "source": {
-        "source": "github",
-        "repo": "qf-studio/navigator"
-      }
     }
   },
   "effortLevel": "high",
