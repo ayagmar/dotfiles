@@ -21,5 +21,6 @@ x-scheme-handler/jetbrains=jetbrainsd.desktop
 x-scheme-handler/claude-cli=claude-code-url-handler.desktop
 x-scheme-handler/claude=com.anthropic.Claude.desktop
 x-scheme-handler/codex=chatgpt.desktop
+x-scheme-handler/t3code=com.t3tools.T3Code.desktop
 
 [Added Associations]
