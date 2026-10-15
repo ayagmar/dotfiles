@@ -16,3 +16,6 @@ fi
 for file in "$HOME/.config/zsh"/*.zsh(.N); do
   source "$file"
 done
+
+# Vite+ bin (https://viteplus.dev)
+. "/home/ayagmar/.config/vite-plus/env"
