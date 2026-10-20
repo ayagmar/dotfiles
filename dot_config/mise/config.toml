@@ -1,5 +1,5 @@
 [tools]
-android-sdk = "latest"
+android-sdk = "23.0"
 bun = "latest"
 go = "latest"
 gradle = "9"
