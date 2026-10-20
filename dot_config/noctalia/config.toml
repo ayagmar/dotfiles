@@ -29,7 +29,7 @@ margin_edge = 12
 widget_spacing = 4
 start = ["workspaces", "spacer", "active_window", "media", "cpu", "memory"]
 center = ["clock"]
-end = ["headroom", "obs", "tray", "notifications", "volume", "control-center"]
+end = ["headroom", "agents", "obs", "tray", "notifications", "volume", "control-center"]
 
 [widget.workspaces]
 max_label_chars = 2
@@ -100,6 +100,67 @@ action = "screen_off"
 timeout = 330
 enabled = true
 
+[desktop_widgets]
+enabled = true
+schema_version = 2
+widget_order = ["clock", "weather", "calendar", "binance", "media"]
+
+# Right-hand column: 480 px wide, 48 px from the right edge, 24 px gaps.
+[desktop_widgets.widget.clock]
+type = "clock"
+output = "DP-1"
+cx = 2272.0
+cy = 176.0
+box_width = 480.0
+box_height = 160.0
+
+[desktop_widgets.widget.clock.settings]
+format = "{:%H:%M}"
+center_text = true
+
+[desktop_widgets.widget.weather]
+type = "weather"
+output = "DP-1"
+cx = 2272.0
+cy = 380.0
+box_width = 480.0
+box_height = 200.0
+
+[desktop_widgets.widget.weather.settings]
+show_forecast = true
+forecast_days = 3
+
+[desktop_widgets.widget.calendar]
+type = "calendar"
+output = "DP-1"
+cx = 2272.0
+cy = 704.0
+box_width = 480.0
+box_height = 400.0
+
+[desktop_widgets.widget.calendar.settings]
+show_events = false
+
+[desktop_widgets.widget.binance]
+type = "ayagmar/binance:desktop"
+output = "DP-1"
+cx = 2272.0
+cy = 1098.0
+box_width = 0.0
+box_height = 0.0
+
+# Bottom-left, 48 px from the edges.
+[desktop_widgets.widget.media]
+type = "media_player"
+output = "DP-1"
+cx = 328.0
+cy = 1302.0
+box_width = 560.0
+box_height = 180.0
+
+[desktop_widgets.widget.media.settings]
+album_art_background = true
+
 [hooks]
 colors_changed = "~/.config/noctalia/scripts/apply-openrgb-theme.py"
 
@@ -107,7 +168,7 @@ colors_changed = "~/.config/noctalia/scripts/apply-openrgb-theme.py"
 type = "ayagmar/obs-control:status"
 
 [plugins]
-enabled = [ "ayagmar/obs-control", "cleboost/jetbrains-provider", "ayagmar/headroom" ]
+enabled = [ "ayagmar/obs-control", "cleboost/jetbrains-provider", "ayagmar/headroom", "ayagmar/niri-computer-use" ]
 # Plugins can run commands, so update them deliberately through `update`
 # (`noctalia msg plugins update <source>`) instead of every six hours.
 auto_update = "none"
@@ -200,6 +261,9 @@ global = true
 
 [widget.headroom]
 type = "ayagmar/headroom:usage"
+
+[widget.agents]
+type = "ayagmar/niri-computer-use:indicator"
 
 [lockscreen_widgets]
 enabled = false
