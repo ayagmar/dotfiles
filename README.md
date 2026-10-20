@@ -131,6 +131,7 @@ python -m unittest discover -s tests -p 'test_update.py'
 ## Root-managed files
 
 - `etc/nftables.conf.tmpl` manages `/etc/nftables.conf`
+- `etc/snapper/configs/modify_root` manages root snapshot retention: 6 hourly, 7 daily, 4 weekly, 2 monthly, no yearly, 10 numbered and 5 important snapshots. It preserves other settings and requires an existing Snapper config. Apply with `sudo chezmoi --source "$HOME/.local/share/chezmoi" --destination / --config "$HOME/.config/chezmoi/chezmoi.toml" apply /etc/snapper/configs/root`, then run `sudo systemctl start snapper-cleanup.service`.
 - `etc/pam.d/greetd` unlocks GNOME Keyring with the login password. The login keyring password must match the account password.
 - local machine values like `lan_subnet` live in `~/.config/chezmoi/chezmoi.toml` and are not tracked
 - apply root-managed files explicitly, e.g. `chezmoi -D / apply /etc/nftables.conf`
