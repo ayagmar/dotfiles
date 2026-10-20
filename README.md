@@ -133,6 +133,7 @@ python -m unittest discover -s tests -p 'test_update.py'
 - `etc/nftables.conf.tmpl` manages `/etc/nftables.conf`
 - `etc/snapper/configs/modify_root` manages root snapshot retention: 6 hourly, 7 daily, 4 weekly, 2 monthly, no yearly, 10 numbered and 5 important snapshots. It preserves other settings and requires an existing Snapper config. Apply with `sudo chezmoi --source "$HOME/.local/share/chezmoi" --destination / --config "$HOME/.config/chezmoi/chezmoi.toml" apply /etc/snapper/configs/root`, then run `sudo systemctl start snapper-cleanup.service`.
 - `etc/pam.d/greetd` unlocks GNOME Keyring with the login password. The login keyring password must match the account password.
+- `etc/NetworkManager/dispatcher.d/90-cake-upload` shapes the wired uplink with CAKE when `enp7s0` comes up, keeping the ISP buffer empty so latency stays ~20 ms during uploads instead of >100 ms. Set its bandwidth to 90-95% of the measured uplink.
 - local machine values like `lan_subnet` live in `~/.config/chezmoi/chezmoi.toml` and are not tracked
 - apply root-managed files explicitly, e.g. `chezmoi -D / apply /etc/nftables.conf`
 

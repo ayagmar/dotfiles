@@ -1,0 +1,20 @@
+#!/bin/sh
+# Keep the uplink from filling Maroc Telecom's buffer while uploading.
+#
+# The F6705 has no SQM, so the queue would otherwise sit in the ISP buffer and
+# push LAN latency from ~20 ms to >100 ms during a large upload. CAKE here
+# paces our own egress, so the queue stays short and latency stays flat, at
+# the cost of peak upload (about 135 of 150 Mbit/s in practice).
+#
+# 150mbit is ~93% of this line's measured ~161 Mbit/s uplink. Re-measure with
+# https://speed.cloudflare.com/__up before changing it, and keep it at 90-95%
+# of the real rate: set it too high and the ISP buffer fills again.
+#
+# Applied by NetworkManager on the wired interface coming up; a reboot clears
+# the qdisc, so this script is what restores it.
+
+if [ "$1" != "enp7s0" ] || [ "$2" != "up" ]; then
+    exit 0
+fi
+
+/usr/bin/tc qdisc replace dev enp7s0 root cake bandwidth 150mbit
