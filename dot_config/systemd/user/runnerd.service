@@ -1,0 +1,13 @@
+[Unit]
+Description=runnerd: ephemeral GitHub Actions runners for trellis and glowly (~/projects/ci-runners/runnerd.toml)
+Documentation=https://ayagmar.github.io/runnerd/
+
+[Service]
+Type=exec
+ExecStart=%h/.local/bin/runnerd serve --config %h/projects/ci-runners/runnerd.toml
+# Runner containers live in Docker, not in this unit: after a stop or crash the next start adopts them.
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=default.target

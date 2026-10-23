@@ -4,6 +4,7 @@ openrgb-server.service
 p11-kit-server.socket
 pipewire-pulse.socket
 pipewire.socket
+runnerd.service
 wireplumber.service
 xdg-user-dirs.service
 xwayland-satellite.service
