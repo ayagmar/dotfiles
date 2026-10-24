@@ -7,4 +7,3 @@ pipewire.socket
 runnerd.service
 wireplumber.service
 xdg-user-dirs.service
-xwayland-satellite.service
