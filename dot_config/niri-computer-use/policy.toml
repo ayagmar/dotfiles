@@ -5,3 +5,6 @@ unrestricted = true
 
 # screenshot save_path writes here.
 capture_dir = "~/Pictures/agent"
+
+# Every client goes through the one shared engine; no standalone fallback.
+shared = "required"

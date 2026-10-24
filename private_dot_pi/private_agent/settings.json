@@ -1,5 +1,5 @@
 {
-  "lastChangelogVersion": "1.2.0",
+  "lastChangelogVersion": "1.4.0",
   "packages": [
     "npm:pi-promptsmith",
     "npm:pi-extmgr",
@@ -7,18 +7,32 @@
     "git:github.com/edxeth/pi-gpt-config",
     "git:github.com/ayagmar/pi-message-recall",
     "git:git@github.com:ayagmar/pi-codex-web-search.git",
-    "git:git@github.com:elidickinson/pi-claude-bridge.git"
+    "git:git@github.com:Whamp/pi-token-burden.git",
+    "https://github.com/earendil-works/pi-claude-code"
   ],
-  "defaultProvider": "openrouter",
-  "defaultModel": "deepseek/deepseek-v4.1-flash",
-  "defaultThinkingLevel": "max",
-  "hideThinkingBlock": true,
+  "defaultProvider": "claude-bridge",
+  "defaultModel": "claude-opus-5-5",
+  "defaultThinkingLevel": "high",
+  "hideThinkingBlock": false,
   "theme": "system/noctalia-noctalia-default",
   "gptConfig": {
-    "fastMode": true,
+    "fastMode": false,
     "personality": "none",
     "verbosity": "low",
     "summary": "auto",
     "showFooter": true
-  }
+  },
+  "deviceId": "f0db25c5-0070-420f-ae3d-f921188985bc",
+  "markdown": {
+    "mermaid": "streaming"
+  },
+  "terminal": {
+    "showTerminalProgress": true
+  },
+  "warnings": {
+    "anthropicExtraUsage": false
+  },
+  "defaultProjectTrust": "always",
+  "showCacheMissNotices": true,
+  "cacheWarming": "streaming"
 }

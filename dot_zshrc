@@ -19,3 +19,10 @@ done
 
 # Vite+ bin (https://viteplus.dev)
 . "/home/ayagmar/.config/vite-plus/env"
+
+# opencode
+export PATH=/home/ayagmar/.opencode/bin:$PATH
+
+. "$HOME/.atuin/bin/env"
+
+eval "$(atuin init zsh)"

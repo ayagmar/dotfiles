@@ -1,15 +1,15 @@
 [tools]
 android-sdk = "23.0"
 bun = "latest"
-go = "latest"
+go = "1.27.3"
 gradle = "9"
 herdr = "latest"
-java = "25.0.2"
+java = "27.0.0"
 jbang = "latest"
 maven = "3"
 node = "lts"
 pnpm = "latest"
-uv = "latest"
+uv = "0.13.5"
 "github:spicetify/cli" = "latest"
 
 [settings]

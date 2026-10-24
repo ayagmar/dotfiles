@@ -10,8 +10,8 @@ Host github-theodo
     IdentityFile ~/.ssh/id_ed25519_theodo
     IdentitiesOnly yes
 
-Host laptop 192.168.1.20
-    HostName 192.168.1.20
+Host laptop 192.168.1.23
+    HostName 192.168.1.23
     User ayagmar
     IdentityFile ~/.ssh/id_laptop
     IdentityAgent /run/user/%i/gcr/ssh
