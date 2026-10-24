@@ -1,0 +1,18 @@
+timeout:5
+default_entry:1
+
+/Arch Linux
+    protocol: linux
+    kernel_path: boot():/vmlinuz-linux
+    module_path: boot():/initramfs-linux.img
+    cmdline: root=UUID={{ .root_uuid }} rw rootflags=subvol=@ nvidia_drm.modeset=1
+
+/Arch Linux LTS
+    protocol: linux
+    kernel_path: boot():/vmlinuz-linux-lts
+    module_path: boot():/initramfs-linux-lts.img
+    cmdline: root=UUID={{ .root_uuid }} rw rootflags=subvol=@ nvidia_drm.modeset=1
+
+/Windows
+    protocol: efi
+    path: guid({{ .windows_efi_partuuid }}):/EFI/Microsoft/Boot/bootmgfw.efi

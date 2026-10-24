@@ -133,9 +133,12 @@ python -m unittest discover -s tests -p 'test_update.py'
 - `etc/nftables.conf.tmpl` manages `/etc/nftables.conf`
 - `etc/snapper/configs/modify_root` manages root snapshot retention: 6 hourly, 7 daily, 4 weekly, 2 monthly, no yearly, 10 numbered and 5 important snapshots. It preserves other settings and requires an existing Snapper config. Apply with `sudo chezmoi --source "$HOME/.local/share/chezmoi" --destination / --config "$HOME/.config/chezmoi/chezmoi.toml" apply /etc/snapper/configs/root`, then run `sudo systemctl start snapper-cleanup.service`.
 - `etc/systemd/system/ci.slice` is the shared CPU and memory ceiling of the self-hosted CI runners that runnerd starts (no reservation; config in `~/projects/ci-runners/runnerd.toml`). Apply with `sudo chezmoi --source "$HOME/.local/share/chezmoi" --destination / --config "$HOME/.config/chezmoi/chezmoi.toml" apply /etc/systemd/system/ci.slice`, then run `sudo systemctl daemon-reload`.
+- `etc/docker/daemon.json` registers the Sysbox runtime used by the CI runners.
+- `etc/greetd/config.toml` starts the packaged Noctalia Greeter session. `/var/lib/noctalia-greeter/` remains greeter-owned runtime and synchronized appearance state.
 - `etc/pam.d/greetd` unlocks GNOME Keyring with the login password. The login keyring password must match the account password.
+- `boot/executable_limine.conf.tmpl` manages the Limine boot menu (`executable_` matches the 0755 mode vfat forces on `/boot`) using `root_uuid` and `windows_efi_partuuid` from the local chezmoi config.
 - `etc/NetworkManager/dispatcher.d/90-cake-upload` shapes the wired uplink with CAKE when `enp7s0` comes up, keeping the ISP buffer empty so latency stays ~20 ms during uploads instead of >100 ms. Set its bandwidth to 90-95% of the measured uplink.
-- local machine values like `lan_subnet` live in `~/.config/chezmoi/chezmoi.toml` and are not tracked
+- local machine values like `lan_subnet`, `root_uuid`, and `windows_efi_partuuid` live in `~/.config/chezmoi/chezmoi.toml` and are not tracked
 - apply root-managed files explicitly, e.g. `chezmoi -D / apply /etc/nftables.conf`
 
 `dot_config/environment.d/40-ssh-agent.conf` and the enabled
@@ -238,7 +241,9 @@ Notes:
 - `dot_local/share/dotfiles/packages/pacman.txt` and `aur.txt` are curated portable baselines.
 - `dot_local/share/dotfiles/packages/*-snapshot.txt` are exact exports from this machine for reference.
 - log into Niri through the packaged Wayland session (`niri.desktop` -> `niri-session`), not a shell `exec niri --session` hack in `~/.zprofile`.
+- greetd runs Noctalia Greeter through `/usr/bin/noctalia-greeter-session`; Noctalia Shell synchronizes its appearance into greeter-owned state with `noctalia msg greeter-sync`.
 - `niri` starts native v5 `noctalia` directly via `spawn-at-startup`, and Noctalia's built-in template pipeline owns theme rendering while the `colors_changed` hook reapplies OpenRGB after colors/templates are ready through one serialized SDK client run.
+- Niri 25.08 and later starts `xwayland-satellite` on demand. Keep the package installed, but do not enable its standalone user service.
 - validate `niri` against the live target path `~/.config/niri/config.kdl`, not the raw `chezmoi` source copy, because the live config includes generated `noctalia.kdl` files that are intentionally not tracked.
 - RGB theme sync currently manages the GPU, keyboard, and motherboard headers through the OpenRGB SDK. Corsair RAM is not synced until OpenRGB exposes it on this machine.
 - `~/.config/xdg-desktop-portal/niri-portals.conf` is intentionally tracked on this machine.

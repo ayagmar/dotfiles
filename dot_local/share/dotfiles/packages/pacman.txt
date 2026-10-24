@@ -30,7 +30,7 @@ yazi
 # Session and desktop
 networkmanager
 greetd
-greetd-tuigreet
+noctalia-greeter
 seatd
 niri
 noctalia
