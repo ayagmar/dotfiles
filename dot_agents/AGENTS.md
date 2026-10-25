@@ -67,7 +67,7 @@
 - A brief is self-contained: read-only rules, repo and branch, exact files, output path, required format. Reviewer briefs ask for findings by severity with `file:line`, a concrete failure scenario, and the smallest fix; no nits; reply with the report path only. Behavior-change briefs list the edge cases: restart and reload mid-operation, failure of each external call, empty, missing and unknown values, old and new versions side by side.
 - Give parallel workers disjoint scopes, and assign shared identifiers (ADR numbers, migration versions, ports) up front.
 - For risky changes (scheduling, concurrency, persistence, public APIs, migrations), have a reviewer challenge the brief before implementation starts. Before merging a PR you were asked to merge, run an adversarial review in its own pane unless told to skip it.
-- Re-check rounds go to the same reviewer with the new head: verify the earlier findings and report only regressions and blockers. Stop the loop when only minor findings remain.
+- Re-check rounds go to the same reviewer with the new head: verify the earlier findings and report only regressions and blockers. Stop when only minor findings remain, and after two re-check rounds at most: fix what is left yourself and merge, or merge and open a follow-up issue.
 - Verify each worker's result yourself, then close its pane.
 
 ## Documentation
