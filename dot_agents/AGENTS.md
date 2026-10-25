@@ -33,6 +33,8 @@
 - Do not add dependencies, fallback paths, compatibility layers, defensive guards, helpers, or abstractions unless the task requires them, a demonstrated failure mode justifies them, or the surrounding code already establishes the pattern.
 - Preserve validation at real input and state boundaries.
 - Reuse equivalent behavior instead of re-implementing it, and do not create parallel code paths for the same behavior. Do not force broad refactors for small one-off changes.
+- Keep one source of truth: when several outputs (UI, CLI, API, notifications, docs) show the same fact, compute and word it once in a shared module that each consumer calls; consumers only render it.
+- When a review keeps finding the same kind of defect, add a mechanical check (lint, script, test) for it instead of relying on the next reminder.
 
 ## Tests
 - Tests must not read or mutate real user or host state; isolate filesystem, environment, network, process, and time dependencies, and use a temporary HOME for runnable tests.
@@ -41,6 +43,9 @@
 - Prefer public interfaces, then property or invariant tests, then focused unit tests for pure logic. Mock only real boundaries: network, clock, OS, external services.
 - Do not write tests that mirror the implementation: getters, generated code, framework behavior, mocks asserting what was passed, snapshots of internals, one per private helper, near-duplicates.
 - For a bug fix, add a regression test that fails first when practical, and test defaults and common paths rather than only edge cases.
+- For stateful logic (schedulers, state machines, caches, reconcilers), assert invariants over generated sequences that include restarts, reloads, failed external calls, and empty or unknown inputs, not only hand-picked scenarios.
+- When outputs that must agree are rendered separately, test them against one shared fixture set.
+- For a wire format or stored data read across versions, test that the previous release still reads the new output, or document the break.
 
 ## Verification
 - Run the relevant formatter, static analysis, and tests before declaring done.
@@ -62,10 +67,14 @@
 
 ## Delegating and Reviewing
 - When running inside herdr (`HERDR_ENV=1`), use it for parallel agents, panes, and independent review. Work per task in a git worktree.
-- Independent reviewers run in pi without global steering so their input is raw: `--no-context-files --no-skills --no-extensions --no-prompt-templates --no-mcp`. For a Claude reviewer, use the same pi command through the `claude-bridge` provider, never `anthropic` or Claude Code: add `-e ~/.pi/agent/git/github.com/elidickinson/pi-claude-bridge --model claude-bridge/<model>`.
+- Independent reviewers run in pi on sol while its quota lasts, without global steering so their input is raw: `--no-context-files --no-skills --no-extensions --no-prompt-templates --no-mcp --model openai-codex/gpt-6.1-sol`. When sol is out of quota, use Claude Code: `claude --dangerously-skip-permissions --model claude-opus-5-5 --effort medium`, or `--effort high` for risky or high-severity reviews.
+- Start workers and reviewers as named interactive agents in visible panes (`herdr agent start`, then `herdr agent prompt`), never headless, so the owner can watch them; say which pane each one is in.
+- For risky changes (scheduling, concurrency, persistence, public APIs, migrations), have a reviewer challenge the brief or plan before implementation starts.
+- Give parallel workers disjoint scopes, and assign shared identifiers (ADR numbers, migration versions, ports) up front.
 - Before merging a PR you were asked to merge, run an adversarial review in its own pane unless told to skip it.
 - When briefing a delegated reviewer, require findings by severity with `file:line`, a concrete failure scenario, and the smallest fix; no style nits or padding; reply only with the report path. After fixes, send the same reviewer the new head to re-check.
 - A delegated brief is self-contained: read-only rules, repo and branch, exact files, output path, required format.
+- A brief for a behavior change lists the edge cases to cover: restart and reload mid-operation, failure of each external call, empty, missing and unknown values, and old and new versions running side by side.
 - When asked for a handoff, produce a self-contained brief the next agent can execute without this conversation.
 
 ## Documentation and Summaries
