@@ -1,4 +1,4 @@
-# Parent cgroup of every self-hosted CI container (~/projects/ci-runners: `cgroup_parent: ci.slice`). A ceiling,
+# Parent cgroup of every self-hosted CI container (runnerd's `[host] slice`). A ceiling,
 # never a reservation: CI is throttled above 42 GB and never holds more than 46 GB, and when the desktop wants
 # the CPU too, CI gets a fifth of its share. Idle, CI takes nothing from here.
 [Unit]

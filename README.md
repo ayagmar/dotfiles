@@ -132,7 +132,7 @@ python -m unittest discover -s tests -p 'test_update.py'
 
 - `etc/nftables.conf.tmpl` manages `/etc/nftables.conf`
 - `etc/snapper/configs/modify_root` manages root snapshot retention: 6 hourly, 7 daily, 4 weekly, 2 monthly, no yearly, 10 numbered and 5 important snapshots. It preserves other settings and requires an existing Snapper config. Apply with `sudo chezmoi --source "$HOME/.local/share/chezmoi" --destination / --config "$HOME/.config/chezmoi/chezmoi.toml" apply /etc/snapper/configs/root`, then run `sudo systemctl start snapper-cleanup.service`.
-- `etc/systemd/system/ci.slice` is the shared CPU and memory ceiling of the self-hosted CI runners that runnerd starts (no reservation; config in `~/projects/ci-runners/runnerd.toml`). Apply with `sudo chezmoi --source "$HOME/.local/share/chezmoi" --destination / --config "$HOME/.config/chezmoi/chezmoi.toml" apply /etc/systemd/system/ci.slice`, then run `sudo systemctl daemon-reload`.
+- `etc/systemd/system/ci.slice` is the shared CPU and memory ceiling of the self-hosted CI runners that runnerd starts (no reservation; config in `~/.config/runnerd/runnerd.toml`, outside chezmoi because it holds a notification secret). Apply with `sudo chezmoi --source "$HOME/.local/share/chezmoi" --destination / --config "$HOME/.config/chezmoi/chezmoi.toml" apply /etc/systemd/system/ci.slice`, then run `sudo systemctl daemon-reload`.
 - `etc/docker/daemon.json` registers the Sysbox runtime used by the CI runners.
 - `etc/greetd/config.toml` starts the packaged Noctalia Greeter session. `/var/lib/noctalia-greeter/` remains greeter-owned runtime and synchronized appearance state.
 - `etc/pam.d/greetd` unlocks GNOME Keyring with the login password. The login keyring password must match the account password.
