@@ -62,7 +62,10 @@
 
 ## Delegating and Reviewing
 - Inside herdr (`HERDR_ENV=1`), workers and reviewers run as herdr panes, not built-in subagents, one git worktree each, whether or not the owner mentions herdr.
-- Workers run in Claude Code on Opus at medium effort, never on sol. Reviewers run in pi on sol while its quota lasts, without global steering: `--no-context-files --no-skills --no-extensions --no-prompt-templates --no-mcp --model openai-codex/gpt-6.1-sol`; when sol is out, `claude --dangerously-skip-permissions --model claude-opus-5-5 --effort medium` (`high` for risky reviews). Fable only for a high-risk second opinion the owner approves.
+- Workers run in Claude Code, never on sol, as `claude --dangerously-skip-permissions --model <model> --effort high`. Pick the model by risk:
+  - Sonnet 5.5 for UI, polish, docs, and well-specified features.
+  - Opus 5.5 for risky work: data integrity, persistence and migrations, concurrency, background work, and anything where edge cases decide correctness. Sonnet tends to miss those edge cases and overstate guarantees in the PR text.
+- Reviewers run in pi on sol while its quota lasts, without global steering: `--no-context-files --no-skills --no-extensions --no-prompt-templates --no-mcp --model openai-codex/gpt-6.1-sol`; when sol is out, `claude --dangerously-skip-permissions --model claude-opus-5-5 --effort medium` (`high` for risky reviews). Fable only for a high-risk second opinion the owner approves.
 - Start each one as a named interactive agent in a visible pane (`herdr agent start`, then `herdr agent prompt`), never headless; check it is running after you prompt it, and say which pane it is in.
 - A brief is self-contained: read-only rules, repo and branch, exact files, output path, required format. Reviewer briefs ask for findings by severity with `file:line`, a concrete failure scenario, and the smallest fix; no nits; reply with the report path only. Behavior-change briefs list the edge cases: restart and reload mid-operation, failure of each external call, empty, missing and unknown values, old and new versions side by side.
 - Give parallel workers disjoint scopes, and assign shared identifiers (ADR numbers, migration versions, ports) up front.
