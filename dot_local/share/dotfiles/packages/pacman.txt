@@ -4,6 +4,7 @@
 # Base tooling
 base
 base-devel
+zram-generator
 sudo
 openssh
 git

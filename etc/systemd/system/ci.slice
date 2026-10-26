@@ -1,6 +1,7 @@
 # Parent cgroup of every self-hosted CI container (runnerd's `[host] slice`). A ceiling,
 # never a reservation: CI is throttled above 42 GB and never holds more than 46 GB, and when the desktop wants
-# the CPU too, CI gets a fifth of its share. Idle, CI takes nothing from here.
+# the CPU too, CI gets a fifth of its share. Idle, CI takes nothing from here. Under sustained memory
+# pressure systemd-oomd kills a CI container before the desktop's apps (lower limit than user@.service).
 [Unit]
 Description=Self-hosted CI runners
 
@@ -8,3 +9,5 @@ Description=Self-hosted CI runners
 CPUWeight=20
 MemoryHigh=42G
 MemoryMax=46G
+ManagedOOMMemoryPressure=kill
+ManagedOOMMemoryPressureLimit=40%
