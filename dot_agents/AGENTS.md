@@ -49,6 +49,7 @@
 
 ## Git
 - Commit only when asked; stage exact paths, inspect the staged diff, and keep unrelated work out. One Conventional Commit per fix.
+- No `Co-Authored-By` or other agent attribution trailers in commits or PR bodies; GitHub lists every co-author as a contributor.
 - Branch names follow the commit types: `<type>/<topic>`, such as `feat/pools` or `fix/login-redirect`.
 - Merges keep the commit history; do not squash unless told.
 - Push a branch when asked; never rewrite shared history, discard changes, force-push a shared branch, merge to main, or publish unless explicitly requested.
