@@ -1,7 +1,4 @@
-config_version = 15
-
-[backdrop]
-enabled = true
+config_version = 16
 
 [bar.default]
 end = [ "bar", "headroom", "agents", "obs", "tray", "notifications", "volume", "control-center" ]
@@ -106,7 +103,7 @@ widget_order = [ "lockscreen-login-box@DP-1" ]
     type = "login_box"
 
         [lockscreen_widgets.widget."lockscreen-login-box@DP-1".settings]
-        background_color = "surface_variant"
+        background_color = "surface_container"
         background_opacity = 0.88
         background_radius = 12.0
         center_password_text = false
@@ -130,7 +127,8 @@ targets_enabled = true
 [plugin_settings."ayagmar/headroom"]
 bar_accounts = "all"
 bar_style = "value"
-provider_antigravity = "panel"
+display = "remaining"
+provider_antigravity = "off"
 refresh_minutes = 3
 window = "session"
 
@@ -141,9 +139,9 @@ open_videos_after_stop = false
 enabled = [
     "cleboost/jetbrains-provider",
     "ayagmar/obs-control",
-    "ayagmar/niri-computer-use",
     "ayagmar/binance",
-    "ayagmar/headroom"
+    "ayagmar/headroom",
+    "ayagmar/niri-computer-use"
 ]
 
     [[plugins.source]]
@@ -163,7 +161,7 @@ niri_overview_type_to_launch_enabled = true
 builtin = "Noctalia"
 community_palette = "Monochrome"
 mode = "dark"
-source = "builtin"
+source = "wallpaper"
 wallpaper_scheme = "m3-content"
 
 [wallpaper.default]
@@ -188,10 +186,10 @@ theme_mode = "dark"
 wallpaper_scheme = "m3-content"
 
 [[wallpaper.favorite]]
-builtin_palette = "Eldritch"
-palette_source = "builtin"
+palette_source = "wallpaper"
 path = "/home/ayagmar/Pictures/Wallpapers/Anime-Purple-eyes.png"
 theme_mode = "dark"
+wallpaper_scheme = "m3-content"
 
 [[wallpaper.favorite]]
 palette_source = "wallpaper"
