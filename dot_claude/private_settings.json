@@ -13,7 +13,7 @@
       "SendFeedback",
       "ListAgents"
     ],
-    "defaultMode": "auto"
+    "defaultMode": "bypassPermissions"
   },
   "model": "opus",
   "disableClaudeAiConnectors": true,
@@ -127,7 +127,7 @@
       "autoCompactWindow": 400000
     },
     "claude-sonnet-5-5": {
-      "effortLevel": "low"
+      "effortLevel": "high"
     },
     "claude-fable-5-1": {
       "effortLevel": "medium"
@@ -144,5 +144,6 @@
     }
   },
   "skipDangerousModePermissionPrompt": true,
-  "theme": "dark-daltonized"
+  "theme": "dark-daltonized",
+  "awaySummaryEnabled": false
 }
