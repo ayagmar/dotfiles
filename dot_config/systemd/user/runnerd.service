@@ -1,5 +1,5 @@
 [Unit]
-Description=runnerd: ephemeral GitHub Actions runners for trellis and glowly (~/.config/runnerd/runnerd.toml)
+Description=runnerd: ephemeral GitHub Actions runners (~/.config/runnerd/runnerd.toml)
 Documentation=https://ayagmar.github.io/runnerd/
 
 [Service]
