@@ -138,10 +138,10 @@ open_videos_after_stop = false
 [plugins]
 enabled = [
     "cleboost/jetbrains-provider",
-    "ayagmar/obs-control",
     "ayagmar/binance",
     "ayagmar/headroom",
-    "ayagmar/niri-computer-use"
+    "ayagmar/niri-computer-use",
+    "ayagmar/obs-control"
 ]
 
     [[plugins.source]]
