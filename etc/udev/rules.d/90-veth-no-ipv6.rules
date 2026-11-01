@@ -1,0 +1,4 @@
+# Docker's veth interfaces get no IPv6 link-local address. Each one runnerd's runner containers add or remove
+# otherwise counts as a network change to Chromium, which fails in-flight requests with ERR_NETWORK_CHANGED.
+# Docker's networks here have IPv6 disabled, so nothing loses connectivity.
+ACTION=="add", SUBSYSTEM=="net", KERNEL=="veth*", RUN+="/usr/bin/sysctl -qw net.ipv6.conf.%k.disable_ipv6=1"
