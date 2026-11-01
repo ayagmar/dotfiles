@@ -1,4 +1,4 @@
-path=("$HOME/.local/bin" "$HOME/.bun/bin" $path)
+path=("$HOME/.local/bin" "$HOME/.bun/bin" $path "${CARGO_HOME:-$HOME/.cargo}/bin")
 typeset -U path PATH
 
 alias prename='project-rename'
