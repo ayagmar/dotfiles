@@ -2,7 +2,7 @@
 enable_builtin_templates = true
 builtin_ids = ["niri", "kitty", "gtk3", "gtk4", "qt", "btop"]
 enable_community_templates = true
-community_ids = ["discord", "vscode", "yazi"]
+community_ids = ["discord", "zed", "yazi"]
 
 [theme.templates.user.openrgb_colors]
 input_path = "~/.config/noctalia/templates/openrgb-colors.json"
