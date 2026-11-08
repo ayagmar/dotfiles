@@ -2,7 +2,7 @@
     "discordBranch": "stable",
     "minimizeToTray": true,
     "arRPC": true,
-    "hardwareVideoAcceleration": true,
+    "hardwareVideoAcceleration": false,
     "spellCheckLanguages": [
         "en-US",
         "en"
