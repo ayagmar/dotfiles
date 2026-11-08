@@ -1,0 +1,8 @@
+# Local dev builds only; CI runners do not read this file.
+# Backtraces keep file:line. For gdb/lldb variable inspection, override with
+# CARGO_PROFILE_DEV_DEBUG=true.
+[profile.dev]
+debug = "line-tables-only"
+
+[profile.dev.package."*"]
+debug = false
