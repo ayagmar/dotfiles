@@ -73,7 +73,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "npx -y ccdesk@0.5.6 hook --run",
+            "command": "ccdesk hook --run",
             "timeout": 30
           }
         ]
