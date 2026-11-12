@@ -11,7 +11,7 @@
 - When asked to audit, review, plan, or "read only", make zero writes until that is lifted: no edits, no commits, nothing created or modified in the repo, only the report file named. Formatters run in check mode; gitignored build and test artifacts are fine. Do not apply unrequested fixes.
 
 ## Output
-- Short, direct replies with no preamble or recap. Apply the `no-slop` skill to everything people read, chat reports included.
+- Short, direct replies that lead with the answer. After long work, end with a summary that stands on its own: what was done, what was verified, what is left. Apply the `no-slop` skill to everything people read, chat reports included.
 - PR descriptions and messages say what changed, why, and how it was verified; no development history, review rounds, internal IDs or emoji. Show the owner a PR description before opening a PR on a repo they do not own.
 - When asked "wdyt", give one recommendation with a line of reasoning, not every option.
 - In reviews and summaries, list findings first by severity and end with a single verdict line.
