@@ -1,6 +1,6 @@
 ---
 name: fast-worker
-description: Use for mechanical tasks, boilerplate, tests, formatting, simple edits. Execute efficiently.
+description: Use for mechanical tasks, boilerplate, tests, formatting, simple edits.
 model: sonnet
 effort: low
 ---
