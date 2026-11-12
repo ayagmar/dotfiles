@@ -23,9 +23,8 @@ Project instruction files override this file for project-specific conventions.
 
 ## This Machine
 - Arch Linux, Niri on Wayland, Noctalia shell; projects live in `~/projects`. Before changing dotfiles, Niri, Noctalia or system services, read `~/.agents/AGENTS.desktop.md`.
-- The owner works and sleeps next to it: keep builds and tests light (`nice`, at most half the cores, one heavy job at a time), and leave the full suite to CI when the repo has it.
 - Stop what you started once it is no longer needed: emulators, dev servers, mock services, worker panes, the computer-use lease.
-- Clones, worktrees and large scratch go under `~/.cache/<task>/`, not `/tmp`. Remove them when done; keep `~/.cache/checkouts`.
+- Clones, worktrees and large scratch go under `~/.cache/<task>/`, not `/tmp`. Inside herdr, create worker worktrees there with `herdr worktree create --path` and take them down with `herdr worktree remove`. Remove task scratch when done; keep `~/.cache/checkouts`.
 - This file is managed by chezmoi: edit the source, then apply. Edit skills in `~/projects/agents-skills`, not in the installed directories.
 
 ## Sessions
@@ -33,8 +32,8 @@ Project instruction files override this file for project-specific conventions.
 - Before stopping after substantive work, record where it stands (done, in flight, next, open decisions) in the repo's status file if it has one, such as `docs/STATUS.md`, otherwise in your agent memory. Asked where work stopped, read that and search with `session-memory-search` before asking.
 
 ## Code
-- Make the smallest maintainable change. If the right fix is materially broader, say so and ask first; name any shortcut you take.
-- Reuse the established implementation before adding one. Add dependencies, fallbacks, guards, helpers and abstractions only when the task requires them, a demonstrated failure justifies them, or the surrounding code already does it.
+- Build on what exists: reuse the established implementation, and add dependencies, fallbacks, guards, helpers and abstractions only when the task requires them or a demonstrated failure justifies them. If the right fix is materially broader than the request, say so and ask first.
+- Make state explicit: give a lifecycle one named state type with defined transitions, instead of an implicit state machine spread over booleans, nullable fields and call order.
 - One source of truth: a fact shown in several outputs (UI, CLI, API, docs) is computed and worded once in a shared module, and tested against one fixture set.
 - When a review keeps finding the same kind of defect, add a mechanical check for it.
 - Dependencies: read the changelog and types first, use upstream types instead of copies, and state the verified latest compatible version and the reason in the commit.
@@ -52,7 +51,6 @@ Project instruction files override this file for project-specific conventions.
 
 ## Git
 - Commit when asked: stage exact paths, inspect the staged diff, one Conventional Commit per fix. Branches are `<type>/<topic>`, such as `fix/login-redirect`.
-- No `Co-Authored-By` or agent attribution in commits or PR bodies: GitHub lists every co-author as a contributor.
 - Merges keep the commit history unless told to squash.
 - Push when asked. Rewriting shared history, force-pushing a shared branch, discarding changes, merging to main and publishing each need an explicit request; the away rule above covers only task branches and reviewed PRs.
 
@@ -60,6 +58,6 @@ Project instruction files override this file for project-specific conventions.
 - Delegate work that is separable and large enough to pay for another full session; do small or tightly coupled work yourself.
 - Inside herdr (`HERDR_ENV=1`), workers and reviewers run as herdr panes, not built-in subagents, one git worktree each, whether or not the owner mentions herdr.
 - Workers use Sonnet for UI, docs and well-specified features, and Opus for risky work (persistence, migrations, concurrency, background work), because Sonnet tends to miss edge cases and overstate guarantees.
-- Risky changes get a reviewer's challenge of the brief before implementation. A PR you were asked to merge gets an adversarial review first, unless told to skip it.
+- A plan can get an adversarial review before execution, and a risky change always gets one. A PR you were asked to merge gets an adversarial review first, unless told to skip it. Two re-check rounds at most.
 - Verify each worker's result yourself, then close its pane.
 - Before starting a worker or reviewer, read `~/.agents/AGENTS.delegation.md` for commands, brief format and re-check rounds.
