@@ -45,7 +45,16 @@
     "workflow-authoring": "user-invocable-only",
     "dataviz": "name-only",
     "claude-api": "name-only",
-    "update-config": "name-only"
+    "update-config": "name-only",
+    "summarize": "off",
+    "grilling": "off",
+    "grill-me": "off",
+    "draft-coach": "off",
+    "fframes-video": "name-only",
+    "product-spec-foundry": "name-only",
+    "advisor-executor-quality-loop": "name-only",
+    "release-readiness-certification": "name-only",
+    "brag": "name-only"
   },
   "hooks": {
     "SessionStart": [
