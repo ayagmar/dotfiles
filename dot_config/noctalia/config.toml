@@ -261,6 +261,9 @@ global = true
 
 [widget.headroom]
 type = "ayagmar/headroom:usage"
+window = "session"
+bar_style = "value"
+bar_accounts = "all"
 
 [widget.agents]
 type = "ayagmar/niri-computer-use:indicator"

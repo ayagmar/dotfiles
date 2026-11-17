@@ -138,10 +138,10 @@ open_videos_after_stop = false
 [plugins]
 enabled = [
     "cleboost/jetbrains-provider",
-    "ayagmar/binance",
-    "ayagmar/headroom",
+    "ayagmar/obs-control",
     "ayagmar/niri-computer-use",
-    "ayagmar/obs-control"
+    "ayagmar/headroom",
+    "ayagmar/binance"
 ]
 
     [[plugins.source]]
@@ -165,13 +165,13 @@ source = "wallpaper"
 wallpaper_scheme = "m3-content"
 
 [wallpaper.default]
-path = "/home/ayagmar/Pictures/Wallpapers/Anime-Purple-eyes.png"
+path = "/home/ayagmar/Pictures/Wallpapers/Flower-2.png"
 
 [wallpaper.last]
-path = "/home/ayagmar/Pictures/Wallpapers/Anime-Purple-eyes.png"
+path = "/home/ayagmar/Pictures/Wallpapers/Flower-2.png"
 
 [wallpaper.monitors.DP-1]
-path = "/home/ayagmar/Pictures/Wallpapers/Anime-Purple-eyes.png"
+path = "/home/ayagmar/Pictures/Wallpapers/Flower-2.png"
 
 [[wallpaper.favorite]]
 builtin_palette = "Ayu"
