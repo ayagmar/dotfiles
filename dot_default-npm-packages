@@ -1,4 +1,5 @@
-@google/gemini-cli@0.65.0
-cf@1.0.0-beta.20
-llm-usage-metrics@0.14.1
-wrangler@4.152.0
+@google/gemini-cli@0.67.0
+ccdesk@0.5.14
+cf@1.0.0-beta.28
+llm-usage-metrics@0.14.4
+wrangler@4.158.0
