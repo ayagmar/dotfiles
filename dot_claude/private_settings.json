@@ -99,6 +99,17 @@
             "command": "/home/ayagmar/.atuin/bin/atuin hook claude-code"
           }
         ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ ! -f '/home/ayagmar/.claude/skills/impeccable/scripts/impeccable' ] || '/home/ayagmar/.claude/skills/impeccable/scripts/impeccable' hook",
+            "timeout": 5,
+            "statusMessage": "Checking UI changes"
+          }
+        ]
       }
     ],
     "PostToolUseFailure": [
@@ -111,6 +122,18 @@
           }
         ]
       }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ ! -f '/home/ayagmar/.claude/skills/impeccable/scripts/impeccable' ] || '/home/ayagmar/.claude/skills/impeccable/scripts/impeccable' hook",
+            "timeout": 30,
+            "statusMessage": "Design deep pass"
+          }
+        ]
+      }
     ]
   },
   "statusLine": {
@@ -119,7 +142,8 @@
     "refreshInterval": 30
   },
   "enabledPlugins": {
-    "modmgr@ayagmar": true
+    "modmgr@ayagmar": true,
+    "embers@ayagmar": true
   },
   "extraKnownMarketplaces": {
     "ayagmar": {
@@ -136,12 +160,17 @@
       "autoCompactWindow": 400000
     },
     "claude-sonnet-5-5": {
-      "effortLevel": "high"
+      "effortLevel": "medium"
     },
     "claude-fable-5-1": {
-      "effortLevel": "medium"
+      "effortLevel": "medium",
+      "autoCompactWindow": 400000
+    },
+    "claude-fable-5-2": {
+      "effortLevel": "low"
     }
   },
+  "awaySummaryEnabled": false,
   "pluginConfigs": {
     "modmgr@ayagmar": {
       "options": {
@@ -150,9 +179,19 @@
         "debugTimings": false,
         "notifyUpdates": true
       }
+    },
+    "embers@ayagmar": {
+      "options": {
+        "ttlMinutes": 60,
+        "marginMinutes": 5,
+        "coldMode": "ask",
+        "offerOnStart": true,
+        "showBand": true
+      }
     }
   },
   "skipDangerousModePermissionPrompt": true,
   "theme": "dark-daltonized",
-  "awaySummaryEnabled": false
+  "idleCompaction": false,
+  "description": "Impeccable design detector: immediate-tier checks after Edit/Write on UI files, full-rule deep pass on Stop."
 }
