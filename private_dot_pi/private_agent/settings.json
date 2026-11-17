@@ -1,5 +1,5 @@
 {
-  "lastChangelogVersion": "1.4.0",
+  "lastChangelogVersion": "1.5.2",
   "packages": [
     "npm:pi-promptsmith",
     "npm:pi-extmgr",
@@ -8,7 +8,8 @@
     "git:github.com/ayagmar/pi-message-recall",
     "git:git@github.com:ayagmar/pi-codex-web-search.git",
     "git:git@github.com:Whamp/pi-token-burden.git",
-    "https://github.com/earendil-works/pi-claude-code"
+    "https://github.com/earendil-works/pi-claude-code",
+    "git:git@github.com:ayagmar/pi-maestro.git"
   ],
   "defaultProvider": "claude-bridge",
   "defaultModel": "claude-opus-5-5",
@@ -34,5 +35,12 @@
   },
   "defaultProjectTrust": "always",
   "showCacheMissNotices": true,
-  "cacheWarming": "streaming"
+  "cacheWarming": "streaming",
+  "extensionChangelogVersions": {
+    "{\"source\":\"npm:pi-extmgr\",\"scope\":\"user\"}": "0.4.2",
+    "{\"source\":\"https://github.com/davebcn87/pi-autoresearch\",\"scope\":\"user\"}": "1.9.0",
+    "{\"source\":\"git:github.com/ayagmar/pi-message-recall\",\"scope\":\"user\"}": "0.1.0",
+    "{\"source\":\"git:git@github.com:ayagmar/pi-codex-web-search.git\",\"scope\":\"user\"}": "0.2.0",
+    "{\"source\":\"git:git@github.com:Whamp/pi-token-burden.git\",\"scope\":\"user\"}": "0.6.5"
+  }
 }
