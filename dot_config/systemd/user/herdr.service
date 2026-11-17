@@ -1,0 +1,19 @@
+[Unit]
+Description=herdr server: agent panes that outlive the terminal window
+Documentation=https://herdr.dev/docs/
+
+[Service]
+Type=exec
+# The mise shim resolves the global herdr version from ~/.config/mise/config.toml.
+ExecStart=%h/.local/share/mise/shims/herdr server
+WorkingDirectory=%h
+# Panes run $SHELL (zsh), which loads environment.d and mise itself; systemd gives the
+# service the session environment niri imported (SSH_AUTH_SOCK, WAYLAND_DISPLAY, ...).
+Restart=on-failure
+RestartSec=5
+# Throttle the agents' builds before the desktop starves; oomd then picks this unit,
+# not kitty or niri, when memory and swap both run out.
+MemoryHigh=48G
+
+[Install]
+WantedBy=default.target
